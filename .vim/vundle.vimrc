@@ -42,8 +42,6 @@ Plugin 'christoomey/vim-tmux-navigator'
 " ================
 Plugin 'flazz/vim-colorschemes'
 
-colorscheme jelleybeans
-
 " Different colors for different identifiers
 " ==========================================
 Plugin 'jaxbot/semantic-highlight.vim'

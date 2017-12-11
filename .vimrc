@@ -145,6 +145,8 @@ set timeout timeoutlen=1000 ttimeoutlen=100
 " Colorscheme tweaks
 " ==================
 
+colorscheme jelleybeans
+
 " Dim comments
 hi Normal ctermbg=None
 hi NonText ctermbg=None
