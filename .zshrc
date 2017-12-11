@@ -5,6 +5,8 @@ export ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
+[[ -d $ZSH/themes/bullet-train ]] || git clone https://github.com/caiogondim/bullet-train.zsh $ZSH/themes/bullet-train
+[[ -e $ZSH/themes/bullet-train.zsh-theme ]] || ln -s $ZSH/themes/bullet-train/bullet-train.zsh-theme $ZSH/themes/
 ZSH_THEME="bullet-train"
 
 BULLETTRAIN_PROMPT_CHAR="◤"
