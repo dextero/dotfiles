@@ -1,3 +1,6 @@
 [submodule ".oh-my-zsh"]
 	path = .oh-my-zsh
 	url = https://github.com/robbyrussell/oh-my-zsh
+[submodule ".gdb/gdb-dashboard"]
+	path = .gdb/gdb-dashboard
+	url = https://github.com/cyrus-and/gdb-dashboard
