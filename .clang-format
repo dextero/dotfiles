@@ -1,0 +1,6 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+AccessModifierOffset: -4
+PointerAlignment: Left
+BinPackArguments: false
+BinPackParameters: false
