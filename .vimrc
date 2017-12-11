@@ -1,29 +1,7 @@
 set nocompatible
 
-"""
-"   SYSTEM-SPECIFIC
-"""
-
-if has("unix")
-    let $CTAGS = 'ctags'
-
-    if $TERM == "xterm-256color" || $TERM == "screen-256color" || $COLORTERM == "gnome-terminal"
-        set t_Co=256
-    endif
-elseif has("win32")
-    set guifont=Consolas:cEASTEUROPE
-
-    let $HOME = $USERPROFILE
-    let $VIM = "C:/Program Files (x86)/Vim"
-endif
-
-"""
-"   PLUGINS
-"""
-
-"""
-" FZF / https://github.com/junegunn/fzf
-"""
+" FZF fuzzy searcher: https://github.com/junegunn/fzf
+" ===================================================
 set rtp+=$HOME/.fzf/
 
 function! FindFileDir(path, maxdepth, file)
@@ -40,6 +18,7 @@ function! FindFileDir(path, maxdepth, file)
     return FindFileDir(l:dirname, a:maxdepth - 1, a:file)
 endfunction
 
+" Looks for the closest parent directorythat looks like a project root
 function! FindProjectRoot(path)
     if a:path == ''
         let p = getcwd()
@@ -57,190 +36,145 @@ function! FindProjectRoot(path)
     return fnamemodify(a:path, ':h')
 endfunction
 
+" Attempt to detect a project root to perform search in
 nmap <C-p> :execute 'FZF' FindProjectRoot(expand('%:p'))<CR>
 
-"""
-" CtrlP
-"""
-let g:ctrlp_extensions = [ 'buffertag', 'tag', 'line', 'dir' ]
 
-"""
-" ack-vim
-"""
-
-let g:ackprg = 'ag --nogroup --nocolor --column'
-
+" Load all plugins managed by Vundle
+" ==================================
 source $HOME/.vim/vundle.vimrc
+
+
+" Settings
+" ========
+"
+" Force 256-color mode
+set t_Co=256
+
+" Always display a status line 
 set laststatus=2
 
-"""
-"   GENERAL
-"""
+" Detect filetype, load appropriate plugins and indent.vim
 filetype plugin indent on
 
+" Do not leave garbage files behind
 set nobackup
+set noswapfile
+
+" Set indent width to 4 spaces, add overrides for some file types
 set tabstop=4
 set shiftwidth=4
 set expandtab
+
+au BufNewFile,BufRead *.tex setlocal tabstop=2 shiftwidth=2
+au BufNewFile,BufRead *.sls setlocal tabstop=2 shiftwidth=2 " Saltstack state files
+
+" Auto-indent code
 set autoindent
+set smartindent
+
+" Show cursor line/column in status bar
 set ruler
-set noswapfile
 
+" Filename suffixes ignored for file name completion
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
-"au BufNewFile,BufRead *.frag,*.vert,*.fp,*.vp,*.glsl,*.vs,*.fs set ft=glsl
-"au BufNewFile,BufRead *.hx set ft=haxe
-au BufNewFile,BufRead *.teccen set ft=teccen
 
-au BufNewFile,BufRead *.tex setlocal tabstop=2
-au BufNewFile,BufRead *.tex setlocal shiftwidth=2
-
-au BufNewFile,BufRead *.sls set ts=2 sts=2 sw=2
-
+" When saving, make a copt and overwrite the original
 set backupcopy=yes
+
+" Show partial commands in the status line
 set showcmd
+
+" Show matching brackets
 set showmatch
-set autowrite
+
+" Show relative line numbers
 set number
 set relativenumber
-set nobackup
+
+" Leave a N-line margin when scrolling
 set scrolloff=10
 
-" always show status bar
-set laststatus=2
+" Search options
+set incsearch  " search as you type
+set ignorecase " case-insensitive by default
+set smartcase  " switch to case-sensitive if pattern has an uppercase character
+set hlsearch   " highlight search results
 
-" searching
-set ignorecase
-set incsearch
-set smartcase
-set hlsearch
-
-" folding
+" Folding options
 set foldmethod=syntax
 "set foldmethod=manual
 set foldnestmax=10
 set nofoldenable
 set foldlevelstart=1
 
-let javaScript_fold=1
-let perl_fold=1
-let php_folding=1
-let r_syntax_folding=1
-let ruby_fold=1
-let sh_fold_enabled=1
-let vimsyn_folding='af'
-let xml_syntax_folding=1
-
-" wildcard tab-completion
+" Wildcard tab-completion
 set wildmode=longest,list,full
 set wildmenu
 
-" file encoding
+" Syntax tab-completion mode
+set completeopt=longest,menuone
+
+" File encoding
 set fenc=utf8
 set enc=utf8
 
-" syntax coloring
-syn on
-
-set completeopt=longest,menuone
+" Syntax coloring
+syntax on
 
 " row/column highlighting
 set cursorline
 set cursorcolumn
 
-" recursive cwd search
+" Recursive cwd search on `gf`, `:find` etc.
 set path+=**
 
-" persistent undo
-"if has('undofile')
-    set undofile
-    set undodir=$HOME/.vim/undo
-    set undolevels=1000
-    set undoreload=10000
-"endif
+" Persistent undo
+set undofile
+set undodir=$HOME/.vim/undo
+set undolevels=1000
+set undoreload=10000
 
 let g:netrw_liststyle=3
 
-" fix slight delay after pressing <Esc>O
+" Fix slight delay after pressing <Esc>O
 " http://ksjoberg.com/vim-esckeys.html
 set timeout timeoutlen=1000 ttimeoutlen=100
 
-" fix shift-typos :W, :Q
-:command! W w
-:command! Q q
 
-"""
-"   COLOR SCHEME
-"""
+" Colorscheme tweaks
+" ==================
 
-let myCurrentTheme=1
-
-if isdirectory($HOME."/.vim/bundle/vim-colorschemes")
-    if myCurrentTheme == 0
-        source $HOME/.vim/bundle/vim-colorschemes/colors/busierbee.vim
-    elseif myCurrentTheme == 1
-        source $HOME/.vim/bundle/vim-colorschemes/colors/jelleybeans.vim
-    elseif myCurrentTheme == 2
-        source $HOME/.vim/bundle/vim-colorschemes/colors/wombat256mod.vim
-    elseif myCurrentTheme == 3
-        source $HOME/.vim/bundle/vim-colorschemes/colors/solarized.vim
-    endif
-endif
-
-" common scheme tweaks
+" Dim comments
 hi Normal ctermbg=None
 hi NonText ctermbg=None
 hi Comment ctermfg=240 guifg=#333333
 
-" diff tweaks
+" Diff color tweaks
 hi DiffAdd ctermbg=22 guifg=#005f00
 hi DiffChange ctermbg=100 guifg=#878700
 hi DiffDelete ctermbg=52 guifg=#5f0000
 
-unlet myCurrentTheme
-
-"""
-"   USEFUL AUTOCMDS
-"""
-
-" EOL whitespaces highlighting
-hi default link EndOfLineSpace ErrorMsg
-hi default link AnyTab ErrorMsg
+" Highlight tabs and EOL whitespaces
+highlight default link EndOfLineSpace ErrorMsg
+highlight default link AnyTab ErrorMsg
 match EndOfLineSpace /\s\+$/
 match AnyTab /\t/
 autocmd InsertEnter * hi default link EndOfLineSpace Normal
 autocmd InsertLeave * hi default link EndOfLineSpace ErrorMsg
 
-" octave
-au BufNewFile,BufRead *.m octave
-au BufNewFile,BufRead *.m syntax=matlab
 
-"""
-"   CODE COMPLETION
-"""
+" Mappings
+" ========
 
-set ofu=syntaxcomplete#Complete
+" Auto-interpret common shift-typos :W, :Q
+:command! W w
+:command! Q q
 
-function! CleverTab()
-    if pumvisible()
-        return "\<C-N>"
-    endif
-    if strpart( getline('.'), 0, col('.')-1 ) =~ '^\s*$'
-        return "\<Tab>"
-    elseif exists('&omnifunc') && &omnifunc != ''
-        return "\<C-X>\<C-O>"
-    else
-        return "\<C-N>"
-    endif
-endfunction
-
-"""
-"   MAPPINGS
-"""
-
-" fix syntax coloring
+" Fix broken syntax coloring
 inoremap <F9> <C-o>:syntax sync fromstart<CR>
 
-" colorcolumn at 80. character: toggle
+" Highlight 80. column
 function! ToggleColorColumn()
     if (&l:colorcolumn > 0)
         set colorcolumn=0
@@ -259,23 +193,20 @@ nnoremap j gj
 nnoremap gk k
 nnoremap gj j
 
-" fold toggle in normal mode
+" Fold toggle in normal mode
 nnoremap \ft za
 
-" fold block
+" Fold block
 nnoremap \fb vaBzf
 
-" clear search highlights
+" Clear search highlights
 nmap \q :nohlsearch<CR>
 
-nmap \td :make -j9 CXXFLAGS='-Wno-non-virtual-dtor -Wno-cpp'<CR>
-nmap \th :make -j9 CXX='clang++' CXXFLAGS='-Wno-mismatched-tags -Wno-non-virtual-dtor'<CR>
-
-" buffers
+" Toggle buffers
 nmap [b :bprev<CR>
 nmap ]b :bnext<CR>
 
-" quickfix list
+" :make options
 let g:makeopts = "-j9"
 nmap \b :execute 'make' g:makeopts<CR>
 nmap \B :make clean<CR>:execute 'make' makeopts<CR>
@@ -283,106 +214,11 @@ nmap \B :make clean<CR>:execute 'make' makeopts<CR>
 autocmd filetype rust compiler cargo
 autocmd filetype rust let makeopts='build'
 
+" Quickfix list
 nmap \o :copen<CR>
 nmap [q :cprev<CR>
 nmap ]q :cnext<CR>
 
-" tag list
+" Tag list
 nmap ]t :tnext<CR>
 nmap [t :tprevious<CR>
-
-" LaTeX
-nmap \l :!export TEMP=`mktemp -d`
-        \ && pdflatex -output-directory $TEMP -halt-on-error %
-        \ && echo "biber --output-directory $TEMP --input-directory $TEMP %<"
-        \ && echo "pdflatex -output-directory $TEMP -halt-on-error %"
-        \ && mkdir -p ./out
-        \ && cp $TEMP/%<.pdf out/<CR>
-
-" IntelliJ-like commenting on ctrl+/
-nmap <C-_> \c<Space>j
-vmap <C-_> \c<Space>'>j
-
-" JavaScript context coloring
-nmap \C :JSContextColorToggle<CR>
-
-" semanting highlighting
-nmap \S :SemanticHighlightToggle<CR>
-
-function! RegenerateCTags()
-    let result = system("sh -c \"ag -g '.*\\.(c|h|cc|cpp)$' --ignore-dir=CMakeFiles | xargs ctags\"")
-    echo "CTags regenerated: " . result
-endfunction
-
-" regenerate tags
-nmap \T :call RegenerateCTags()<CR>
-
-" get manual page
-function! FindManualPage(name, section)
-    let manpage = system("man " . a:section . " " . a:name)
-
-    if (v:shell_error)
-        if (a:section < 3)
-            return FindManualPage(a:name, a:section + 1)
-        else
-            return ""
-        endif
-    endif
-
-    return manpage
-endfunction
-
-" find struct definition in header files
-function! FindStructDef(name)
-    let regexp = "\\s*struct " . a:name . "\\s*{[^}]*};"
-    let result = system("find /usr/include -type f -exec grep -HPzo '" . regexp . "' {} \\;")
-
-    if (v:shell_error)
-        return ""
-    else
-        return result
-    endif
-endfunction
-
-" open manual page in split window
-function! FindAndOpenManual()
-    let word = expand("<cword>")
-    let manpage = FindManualPage(word, 2)
-
-    let winnr = bufwinnr("__manual__")
-
-    if (manpage == "")
-        let manpage = FindStructDef(word)
-    endif
-
-    if (manpage == "")
-        " close the window, nothing to see there
-        if (winnr >= 0)
-            execute winnr . "wincmd w"
-            wincmd q
-        endif
-
-        echo "No manual entry for " . word . "(returned: " . v:shell_error . ")"
-    else
-        " check if window is already opened
-        if (winnr >= 0)
-            " yup, jump there
-            execute winnr . "wincmd w"
-        else
-            " nope, create it
-            vsplit __manual__
-        endif
-
-        " set buffer options and content
-        set filetype=man
-        set buftype=nofile
-        normal! gg"_dG
-        call append(0, split(manpage, "\n"))
-
-        " return to previous window
-        wincmd p
-    endif
-endfunction
-
-"nmap K :call FindAndOpenManual()<CR>
-

@@ -48,9 +48,14 @@ colorscheme jelleybeans
 " ==========================================
 Plugin 'jaxbot/semantic-highlight.vim'
 
+nmap \S :SemanticHighlightToggle<CR>
+
 " Grep a directory, return results in quickfix list
 " =================================================
 Plugin 'mileszs/ack.vim'
+
+" Use silversearcher-ag instead of ack-grep
+let g:ackprg = 'ag --nogroup --nocolor --column'
 
 " Write HTML/XML quickly
 " ======================
