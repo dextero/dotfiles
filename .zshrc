@@ -113,9 +113,9 @@ alias glg="git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d
 alias gsuir="git submodule update --init --recursive"
 
 # Install FZF if required
-[[ -d /.fzf ]] || {
-    git clone https://github.com/junegunn/fzf .fzf
-    .fzf/install
+[[ -d ~/.fzf ]] || {
+    git clone https://github.com/junegunn/fzf ~/.fzf
+    ~/.fzf/install
 }
 source ~/.fzf.zsh
 
