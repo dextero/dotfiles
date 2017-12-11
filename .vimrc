@@ -21,34 +21,6 @@ endif
 "   PLUGINS
 """
 
-" Airline
-let g:airline_powerline_fonts=1
-
-" YouCompleteMe
-let g:ycm_global_ycm_extra_conf = $HOME."/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
-let g:ycm_confirm_extra_conf = 0
-let g:ycm_server_log_level = 'debug'
-
-hi YcmErrorSection ctermbg=52 guibg=#330000
-hi YcmWarningSection ctermbg=58 guibg=#333300
-
-" YCM rust completion config
-let g:ycm_rust_src_path = split(system("rustc --print sysroot"), '\n')[0] . "/lib/rustlib/src/rust/src"
-
-" vim-js-context-coloring
-highlight JSCC_CommentHigroup ctermfg=237
-let g:js_context_colors_comment_higroup = 'JSCC_CommentHigroup'
-
-let g:js_context_colors = [ 253, 119, 227, 69, 167, 122, 224 ]
-                          " white, green, yellow, blue, red, cyan, grey
-
-" syntastic
-let g:syntastic_c_checkers = [ 'gcc' ]
-let g:syntastic_cpp_checkers = [ 'gcc' ]
-let g:syntastic_python_chechers = [ 'pep8' ]
-
-let g:syntastic_c_check_header = 1
-
 """
 " FZF / https://github.com/junegunn/fzf
 """
@@ -298,18 +270,6 @@ nmap \q :nohlsearch<CR>
 
 nmap \td :make -j9 CXXFLAGS='-Wno-non-virtual-dtor -Wno-cpp'<CR>
 nmap \th :make -j9 CXX='clang++' CXXFLAGS='-Wno-mismatched-tags -Wno-non-virtual-dtor'<CR>
-
-" Gundo
-" plugins are loaded *after* the .vimrc is processed, so a direct exists() call
-" does not work; it needs to be delayed
-function! InitUndoTreeBinding()
-    if exists(':MundoToggle')
-        nmap \G :MundoToggle<CR>
-    else
-        nmap \G :GundoToggle<CR>
-    endif
-endfunction
-autocmd VimEnter * :call InitUndoTreeBinding()
 
 " buffers
 nmap [b :bprev<CR>
