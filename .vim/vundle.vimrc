@@ -53,9 +53,7 @@ vmap <C-_> \c<Space>'>j
 Plugin 'scrooloose/syntastic'
 
 " Checker commands for various languages
-let g:syntastic_c_checkers = [ 'gcc' ]
-let g:syntastic_cpp_checkers = [ 'gcc' ]
-let g:syntastic_python_chechers = [ 'pep8' ]
+let g:syntastic_python_flake8_args = '--max-line-length=119'
 
 let g:syntastic_python_python_exe = 'python3 -m py_compile'
 let g:syntastic_python_pylint_exe = 'pylint3'
