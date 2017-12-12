@@ -66,8 +66,10 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 
-au BufNewFile,BufRead *.tex setlocal tabstop=2 shiftwidth=2
-au BufNewFile,BufRead *.sls setlocal tabstop=2 shiftwidth=2 " Saltstack state files
+augroup vimrc_indent
+    au BufNewFile,BufRead *.tex setlocal tabstop=2 shiftwidth=2
+    au BufNewFile,BufRead *.sls setlocal tabstop=2 shiftwidth=2 " Saltstack state files
+augroup END
 
 " Auto-indent code
 set autoindent
@@ -126,8 +128,13 @@ syntax on
 set cursorline
 set cursorcolumn
 
+" Auto-detect and apply vim modeline in files
+set modeline
+
 " Recursive cwd search on `gf`, `:find` etc.
 set path+=**
+" Also search system include directories
+let &path=&path . ',' . system("cc -E -Wp,-v - </dev/null 2>&1 | awk '/^ /{print $1}' | paste -sd,")
 
 " Persistent undo
 set undofile
@@ -135,6 +142,10 @@ set undodir=$HOME/.vim/undo
 set undolevels=1000
 set undoreload=10000
 
+" Shorten displayed messages
+set shortmess=a
+
+" Use tree-view style of opened directories
 let g:netrw_liststyle=3
 
 " Fix slight delay after pressing <Esc>O
@@ -183,17 +194,18 @@ autocmd InsertLeave * hi default link EndOfLineSpace ErrorMsg
 " Fix broken syntax coloring
 inoremap <F9> <C-o>:syntax sync fromstart<CR>
 
-" Highlight 80. column
-function! ToggleColorColumn()
-    if (&l:colorcolumn > 0)
+" Highlight columns after specified one
+function! ToggleColorColumn(col)
+    if (&l:colorcolumn =~ '^'.a:col.',')
         set colorcolumn=0
     else
-        let &colorcolumn=join(range(81,999),",")
+        let &colorcolumn=join(range(a:col,999),",")
     endif
 endfunction
 
 highlight ColorColumn ctermbg=233 guibg=#555555
-nmap \8 :call ToggleColorColumn()<CR>
+nmap \8 :call ToggleColorColumn(80)<CR>
+nmap \0 :call ToggleColorColumn(120)<CR>
 
 " Make j/k move to next visual line instead of physical line
 " http://yubinkim.com/?p=6
@@ -233,3 +245,11 @@ nmap ]q :cnext<CR>
 " Tag list
 nmap ]t :tnext<CR>
 nmap [t :tprevious<CR>
+
+
+" Custom filetypes
+" ================
+
+augroup vimrc_filetypes
+    au BufNewFile,BufRead *.teccen setfiletype teccen
+augroup END
