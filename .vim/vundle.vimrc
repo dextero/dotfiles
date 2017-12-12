@@ -149,4 +149,16 @@ Plugin 'PProvost/vim-ps1'
 " =========================
 Plugin 'lyuts/vim-rtags'
 
+" Side pane with tag overview for C/C++
+" =====================================
+Plugin 'majutsushi/tagbar'
+
+" Mark uncommitted changes in gutter
+" ==================================
+Plugin 'airblade/vim-gitgutter'
+
+" Table of contents generator for Markdown
+" ========================================
+Plugin 'mzlogin/vim-markdown-toc'
+
 call vundle#end()
