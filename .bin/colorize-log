@@ -1,0 +1,13 @@
+#!/bin/sh
+
+[ -t 1 ] && PIPE=less || PIPE=cat
+awk '{
+    switch ($0) {
+        case / TRACE /:   { color = "\033[37;2m"; break }
+        case / INFO /:    { color = "\033[32m"; break }
+        case / WARNING /: { color = "\033[33m"; break }
+        case / ERROR /:   { color = "\033[31m"; break }
+        default:          { color = ""; break }
+    }
+    print color $0 "\033[0m"
+}' "$@" | $PIPE -n
