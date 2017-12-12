@@ -117,6 +117,8 @@ Plugin 'vim-scripts/a.vim'
 " ===========================
 Plugin 'vim-scripts/cscope.vim'
 
+source $HOME/.vim/cscope_maps.vim
+
 " Extra features for writing ReStructuredText
 " ===========================================
 Plugin 'Rykka/riv.vim'
