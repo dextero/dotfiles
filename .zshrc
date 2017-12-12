@@ -11,6 +11,9 @@ ZSH_THEME="bullet-train"
 
 BULLETTRAIN_PROMPT_CHAR="$"
 BULLETTRAIN_STATUS_EXIT_SHOW=true
+BULLETTRAIN_CONTEXT_SHOW=true
+BULLETTRAIN_CONTEXT_DEFAULT_USER=marcin
+
 BULLETTRAIN_PROMPT_ORDER=(
     time
     status
@@ -25,6 +28,8 @@ BULLETTRAIN_PROMPT_ORDER=(
     git
 )
 
+BULLETTRAIN_STATUS_BG=22 # dark green
+BULLETTRAIN_CONTEXT_BG=234 # dark grey
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -67,11 +72,12 @@ BULLETTRAIN_PROMPT_ORDER=(
 # Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
-plugins=(git)
+plugins=(git gradle vagrant)
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
 
 export PATH=$PATH:$HOME/.cabal/bin:$HOME/bin:$HOME/.local/bin:$HOME/.gem/ruby/2.3.0/bin
 # export MANPATH="/usr/local/man:$MANPATH"
