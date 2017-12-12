@@ -10,9 +10,13 @@ export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="bullet-train"
 
 BULLETTRAIN_PROMPT_CHAR="$"
+
 BULLETTRAIN_STATUS_EXIT_SHOW=true
+BULLETTRAIN_STATUS_BG=22 # dark green
+
 BULLETTRAIN_CONTEXT_SHOW=true
 BULLETTRAIN_CONTEXT_DEFAULT_USER=marcin
+BULLETTRAIN_CONTEXT_BG=234 # dark grey
 
 BULLETTRAIN_PROMPT_ORDER=(
     time
@@ -27,9 +31,6 @@ BULLETTRAIN_PROMPT_ORDER=(
     go
     git
 )
-
-BULLETTRAIN_STATUS_BG=22 # dark green
-BULLETTRAIN_CONTEXT_BG=234 # dark grey
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -79,7 +80,17 @@ source $ZSH/oh-my-zsh.sh
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
 
-export PATH=$PATH:$HOME/.cabal/bin:$HOME/bin:$HOME/.local/bin:$HOME/.gem/ruby/2.3.0/bin
+source /etc/zsh_command_not_found
+
+export PATH=$HOME/bin/ccache:$PATH
+export PATH+=:$HOME/.bin
+export PATH+=:$HOME/bin
+export PATH+=:$HOME/.local/bin
+export PATH+=:$HOME/arcanist/bin
+export PATH+=:$HOME/.gem/ruby/2.3.0/bin:$HOME/.gem/bin
+export PATH+=:$HOME/.cargo/bin
+export PATH+=:$HOME/.go/bin
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -116,6 +127,7 @@ ulimit -c unlimited
 # Git aliases
 unalias glg
 alias glg="git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit"
+alias gstl="git stash list --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue) <%an>%Creset' --abbrev-commit"
 alias gsuir="git submodule update --init --recursive"
 
 # Install FZF if required
@@ -138,4 +150,28 @@ mac2ipv6 () {
   local mac=$1 byte0
   printf %02x -v byte0 $((0x${mac:0:2} ^ 2)) >/dev/null
   echo "fe80::$byte0${mac:3:5}ff:fe${mac:9:5}${mac:15:2}"
+}
+
+# Non-destructive rm
+alias RM='/bin/rm'
+TRASH_DIR="$HOME/trash"
+
+rm() {
+    TIMESTAMP=`date +'%s'`
+    DEST_DIR="$TRASH_DIR/$TIMESTAMP/"
+    [ -e "$DEST_DIR" ] || mkdir -p "$DEST_DIR"
+
+    local -a RM_ARGS
+    RM_ARGS=()
+    for ARG in $@; do
+        if [ "$ARG" != '-rf' ]; then
+            if [ "${ARG:0:1}" = '-' ]; then
+                echo "unknown option: $ARG, use /bin/rm"
+            fi
+
+            RM_ARGS+=("$ARG")
+        fi
+    done
+
+    mv ${RM_ARGS[@]} "$DEST_DIR"
 }
