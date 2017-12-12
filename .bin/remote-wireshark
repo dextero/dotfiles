@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Starts tcpdump on a remote host, then forwards its output to local Wireshark over SSH
 
@@ -7,9 +7,9 @@ if [[ ! "$1" ]]; then
     return 1
 fi
 
-local TARGET="$1"
-local IFACE="$1"
+TARGET="$1"
+IFACE="$1"
 shift 2
-local FILTER="$@"
+FILTER="$@"
 
 ssh "$TARGET" -t "tcpdump -s0 -U -n -w - -i '$IFACE' '$FILTER'" | wireshark -k -i -
