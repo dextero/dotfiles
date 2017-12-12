@@ -27,7 +27,6 @@ BULLETTRAIN_PROMPT_ORDER=(
     perl
     ruby
     virtualenv
-    aws
     go
     git
 )
@@ -83,13 +82,13 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 source /etc/zsh_command_not_found
 
 export PATH=$HOME/bin/ccache:$PATH
-export PATH+=:$HOME/.bin
-export PATH+=:$HOME/bin
-export PATH+=:$HOME/.local/bin
-export PATH+=:$HOME/arcanist/bin
-export PATH+=:$HOME/.gem/ruby/2.3.0/bin:$HOME/.gem/bin
-export PATH+=:$HOME/.cargo/bin
-export PATH+=:$HOME/.go/bin
+export PATH=$PATH:$HOME/.bin
+export PATH=$PATH:$HOME/bin
+export PATH=$PATH:$HOME/.local/bin
+export PATH=$PATH:$HOME/arcanist/bin
+export PATH=$PATH:$HOME/.gem/ruby/2.3.0/bin:$HOME/.gem/bin
+export PATH=$PATH:$HOME/.cargo/bin
+export PATH=$PATH:$HOME/.go/bin
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
