@@ -128,10 +128,6 @@ Plugin 'PProvost/vim-ps1'
 " =========================
 Plugin 'lyuts/vim-rtags'
 
-" Tag list in a separate split
-" ============================
-Plugin 'majutsushi/tagbar'
-
 " Language Server Protocol client
 " ===============================
 " TODO: requires manual installation of cquery, python-language-server
@@ -168,5 +164,17 @@ inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 " Function signature in command line
 " ==================================
 Plugin 'Shougo/echodoc.vim'
+
+" Side pane with tag overview for C/C++
+" =====================================
+Plugin 'majutsushi/tagbar'
+
+" Mark uncommitted changes in gutter
+" ==================================
+Plugin 'airblade/vim-gitgutter'
+
+" Table of contents generator for Markdown
+" ========================================
+Plugin 'mzlogin/vim-markdown-toc'
 
 call vundle#end()
