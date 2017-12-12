@@ -1,3 +1,20 @@
+[http]
+	sslCAInfo = /home/marcin/.certs/all.crt
+	sslVerify = false
 [user]
-	email = marcin@mradomski.pl
+	email = m.radomski@avsystem.com
 	name = Marcin Radomski
+[color]
+	ui = true
+[difftool]
+	prompt = false
+[merge]
+	tool = vimdiff3
+[credential]
+	helper = cache --timeout 60
+[alias]
+	stash-unapply = !git stash show -p | git apply -R
+[rerere]
+    enable = true
+[core]
+	excludesfile = ~/.gitignore
