@@ -98,20 +98,16 @@ Plugin 'tpope/vim-surround'
 " ========================================
 Plugin 'vim-scripts/a.vim'
 
-" cscope code browser support
-" ===========================
-Plugin 'vim-scripts/cscope.vim'
-
 " Extra features for writing ReStructuredText
 " ===========================================
 Plugin 'Rykka/riv.vim'
 
-" Automatic code formatting with clang-format 
-" ============================================
+" Automatic code formatting with clang-format
+" ===========================================
 Plugin 'rhysd/vim-clang-format'
 
 " Auto-format on save
-autocmd FileType c,cpp ClangFormatAutoEnable
+"autocmd FileType c,cpp ClangFormatAutoEnable
 
 " Vim configuration for Rust
 " ==========================
