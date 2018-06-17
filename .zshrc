@@ -126,3 +126,10 @@ source ~/.fzf.zsh
 dotfiles() {
     /usr/bin/git --git-dir "$HOME/.cfg" --work-tree="$HOME" "$@"
 }
+
+# https://unix.stackexchange.com/a/79352
+mac2ipv6 () {
+  local mac=$1 byte0
+  printf %02x -v byte0 $((0x${mac:0:2} ^ 2)) >/dev/null
+  echo "fe80::$byte0${mac:3:5}ff:fe${mac:9:5}${mac:15:2}"
+}
