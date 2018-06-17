@@ -57,6 +57,9 @@ let g:syntastic_c_checkers = [ 'gcc' ]
 let g:syntastic_cpp_checkers = [ 'gcc' ]
 let g:syntastic_python_chechers = [ 'pep8' ]
 
+let g:syntastic_python_python_exe = 'python3 -m py_compile'
+let g:syntastic_python_pylint_exe = 'pylint3'
+
 " Force checking headers as well
 let g:syntastic_c_check_header = 1
 
