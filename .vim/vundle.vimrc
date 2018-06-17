@@ -12,24 +12,6 @@ Plugin 'vim-airline/vim-airline'
 
 let g:airline_powerline_fonts=1
 
-" Generic syntax completion engine
-" ================================
-Plugin 'Valloric/YouCompleteMe'
-
-" Compiler flags configuration 
-let g:ycm_global_ycm_extra_conf = $HOME."/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
-" Load local .ycm_extra_conf.py automatically, without asking for confirmation
-"let g:ycm_confirm_extra_conf = 0
-" Debug output from ycmd
-"let g:ycm_server_log_level = 'debug'
-
-" Colors
-highlight YcmErrorSection ctermbg=52 guibg=#330000
-highlight YcmWarningSection ctermbg=58 guibg=#333300
-
-" Rust completion configuration
-let g:ycm_rust_src_path = split(system("rustc --print sysroot"), '\n')[0] . "/lib/rustlib/src/rust/src"
-
 " Show buffer names in the status line
 " ====================================
 Plugin 'bling/vim-bufferline'
@@ -146,5 +128,43 @@ Plugin 'PProvost/vim-ps1'
 " Clang-based code indexing
 " =========================
 Plugin 'lyuts/vim-rtags'
+
+" Tag list in a separate split
+" ============================
+Plugin 'majutsushi/tagbar'
+
+" Language Server Protocol client
+" ===============================
+" TODO: requires manual installation of cquery, python-language-server
+Plugin 'autozimu/LanguageClient-neovim'
+
+let g:LanguageClient_serverCommands = {
+    \ 'c': ['cquery', '--log-file=/tmp/cq.log'],
+    \ 'cpp': ['cquery', '--log-file=/tmp/cq.log'],
+    \ 'py': ['pyls'],
+    \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+    \ }
+let g:LanguageClient_loadSettings = 1
+let g:LanguageClient_settingsPath = $HOME . '/.vim/cquery-settings.json'
+
+nnoremap <Space> :call LanguageClient_contextMenu()<CR>
+nnoremap <C-]> :call LanguageClient#textDocument_definition()<CR>
+
+" Asynchronous completion engine
+" ==============================
+" TODO: requires manual `pip3 install neovim`
+if has('nvim')
+  Plugin 'Shougo/deoplete.nvim'
+else
+  Plugin 'Shougo/deoplete.nvim'
+  Plugin 'roxma/nvim-yarp'
+  Plugin 'roxma/vim-hug-neovim-rpc'
+endif
+
+let g:deoplete#enable_at_startup = 1
+
+" Function signature in command line
+" ==================================
+Plugin 'Shougo/echodoc.vim'
 
 call vundle#end()

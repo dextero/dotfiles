@@ -141,6 +141,10 @@ let g:netrw_liststyle=3
 " http://ksjoberg.com/vim-esckeys.html
 set timeout timeoutlen=1000 ttimeoutlen=100
 
+" Always show the signcolumn; see :h signs
+" deoplete + LSC derp hard without this
+set signcolumn=yes
+
 
 " Colorscheme tweaks
 " ==================
