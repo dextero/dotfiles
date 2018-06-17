@@ -218,6 +218,7 @@ nmap \b :execute 'make' g:makeopts<CR>
 nmap \B :make clean<CR>:execute 'make' makeopts<CR>
 nmap \t :execute 'make test' g:makeopts<CR>
 
+autocmd BufNewFile,BufRead Cargo.toml setf rust
 autocmd filetype rust compiler cargo
 autocmd filetype rust let makeopts='build'
 
