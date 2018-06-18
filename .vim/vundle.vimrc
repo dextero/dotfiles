@@ -53,6 +53,7 @@ vmap <C-_> \c<Space>'>j
 Plugin 'scrooloose/syntastic'
 
 " Checker commands for various languages
+let g:syntastic_python_python_exec = 'python3 -m py_compile'
 let g:syntastic_python_flake8_args = '--max-line-length=119'
 
 let g:syntastic_python_python_exe = 'python3 -m py_compile'
@@ -100,8 +101,10 @@ Plugin 'vim-scripts/a.vim'
 " ===========================================
 Plugin 'Rykka/riv.vim'
 
-" Automatic code formatting with clang-format
-" ===========================================
+let g:riv_disable_folding = 1
+
+" Automatic code formatting with clang-format 
+" ============================================
 Plugin 'rhysd/vim-clang-format'
 
 " Auto-format on save

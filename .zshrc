@@ -174,3 +174,46 @@ rm() {
 
     mv ${RM_ARGS[@]} "$DEST_DIR"
 }
+
+# Git helpers
+rebase-cascade() {
+    while [[ $# -gt 1 ]]; do
+        local BASE=$1
+        local TOP=$2
+
+        git checkout $TOP || return 1
+        git rebase $BASE || return 1
+        shift
+    done
+}
+
+git-extract-changes-to-file() {
+    [[ "$@" ]] \
+        || { echo "Usage: $0 FILES..."; return 1 }
+    git diff-index --quiet @ -- \
+        || { echo "Commit your changes first"; return 1 }
+
+    git checkout @~1 "$@" \
+        && git commit -m "Extract $@ helper" \
+        && git revert --no-edit @ \
+        && git reset @~1 \
+        && git stash \
+        && git reset @~1 \
+        && git commit --amend -a --no-edit \
+        && git stash pop \
+        && git commit -am "Extract changes to $@ from previous commit"
+}
+
+tts() {
+    http --verbose get "http://zygfryd.avsystem.in:8000/play/tts/pl/$(python -c 'import urllib; import sys; print(urllib.quote(sys.stdin.read().strip()))' <<<"$*")"
+}
+
+export KURWA='--conduit-uri=https://phabricator.avsystem.com'
+export CMAKE_BULLSHIT=(CMakeCache.txt CMakeFiles CPackConfig.cmake CPackSourceConfig CMakeScripts Testing CTestTestfile.cmake Makefile cmake_install.cmake install_manifest.txt compile_commands.json)
+export SBT_OPTS="-Xmx4G -XX:+UseG1GC -XX:+CMSClassUnloadingEnabled -Xss2M"
+
+if [ -f '/usr/bin/valgrind' ]; then
+    export VALGRIND="/usr/bin/valgrind --leak-check=full --track-origins=yes -q --error-exitcode=63 --suppressions=$HOME/projects/libcwmp/libcwmp_test.supp"
+elif [ -f '/usr/local/bin/valgrind' ]; then
+    export VALGRIND="/usr/local/bin/valgrind --leak-check=full --track-origins=yes -q --error-exitcode=63 --suppressions=$HOME/projects/libcwmp/libcwmp_test.supp"
+fi
