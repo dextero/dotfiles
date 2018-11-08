@@ -138,10 +138,12 @@ Plugin 'majutsushi/tagbar'
 Plugin 'autozimu/LanguageClient-neovim'
 
 let g:LanguageClient_serverCommands = {
-    \ 'c': ['cquery', '--log-file=/tmp/cq.log'],
-    \ 'cpp': ['cquery', '--log-file=/tmp/cq.log'],
+    \ 'c': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'cpp': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'cuda': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'objc': ['ccls', '--log-file=/tmp/cc.log'],
     \ 'py': ['pyls'],
-    \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+    \ 'rust': ['rustup', 'run', 'stable', 'rls'],
     \ }
 let g:LanguageClient_loadSettings = 1
 let g:LanguageClient_settingsPath = $HOME . '/.vim/cquery-settings.json'
@@ -161,6 +163,7 @@ else
 endif
 
 let g:deoplete#enable_at_startup = 1
+inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 
 " Function signature in command line
 " ==================================

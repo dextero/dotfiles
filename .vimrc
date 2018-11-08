@@ -143,7 +143,7 @@ set timeout timeoutlen=1000 ttimeoutlen=100
 
 " Always show the signcolumn; see :h signs
 " deoplete + LSC derp hard without this
-set signcolumn
+set signcolumn=yes
 
 " Allow unsaved background buffers
 set hidden
