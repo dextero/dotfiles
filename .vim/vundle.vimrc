@@ -131,9 +131,10 @@ Plugin 'lyuts/vim-rtags'
 
 " Language Server Protocol client
 " ===============================
-" TODO: requires manual installation of cquery, python-language-server
+" TODO: requires manual installation of ccls, python-language-server
 Plugin 'autozimu/LanguageClient-neovim'
 
+" {'includeDeclaration': v:false}
 let g:LanguageClient_serverCommands = {
     \ 'c': ['ccls', '--log-file=/tmp/cc.log'],
     \ 'cpp': ['ccls', '--log-file=/tmp/cc.log'],
@@ -143,10 +144,48 @@ let g:LanguageClient_serverCommands = {
     \ 'rust': ['rustup', 'run', 'stable', 'rls'],
     \ }
 let g:LanguageClient_loadSettings = 1
-let g:LanguageClient_settingsPath = $HOME . '/.vim/cquery-settings.json'
+let g:LanguageClient_settingsPath = $HOME . '/.vim/ccls-settings.json'
 
 nnoremap <Space> :call LanguageClient_contextMenu()<CR>
 nnoremap <C-]> :call LanguageClient#textDocument_definition()<CR>
+
+augroup LanguageClient_config
+  au!
+  au BufEnter * let b:Plugin_LanguageClient_started = 0
+  au User LanguageClientStarted setl signcolumn=yes
+  au User LanguageClientStarted let b:Plugin_LanguageClient_started = 1
+  au User LanguageClientStopped setl signcolumn=auto
+  au User LanguageClientStopped let b:Plugin_LanguageClient_stopped = 0
+  au CursorMoved * if b:Plugin_LanguageClient_started | sil call LanguageClient#textDocument_documentHighlight() | endif
+augroup END
+
+function! C_init()
+    setlocal formatexpr=LanguageClient#textDocument_rangeFormatting()
+endfunction
+
+autocmd! FileType c,cpp,cuda,objc :call C_init()
+
+" bases
+nn <silent> \xb :call LanguageClient#findLocations({'method':'$ccls/inheritance'})<cr>
+" bases of up to 3 levels
+nn <silent> \xB :call LanguageClient#findLocations({'method':'$ccls/inheritance','levels':3})<cr>
+" derived
+nn <silent> \xd :call LanguageClient#findLocations({'method':'$ccls/inheritance','derived':v:true})<cr>
+" derived of up to 3 levels
+nn <silent> \xD :call LanguageClient#findLocations({'method':'$ccls/inheritance','derived':v:true,'levels':3})<cr>
+
+" caller
+nn <silent> \xc :call LanguageClient#findLocations({'method':'$ccls/call'})<cr>
+" callee
+nn <silent> \xC :call LanguageClient#findLocations({'method':'$ccls/call','callee':v:true})<cr>
+
+" $ccls/member
+" nested classes / types in a namespace
+nn <silent> \xs :call LanguageClient#findLocations({'method':'$ccls/member','kind':2})<cr>
+" member functions / functions in a namespace
+nn <silent> \xf :call LanguageClient#findLocations({'method':'$ccls/member','kind':3})<cr>
+" member variables / variables in a namespace
+nn <silent> \xm :call LanguageClient#findLocations({'method':'$ccls/member'})<cr>
 
 " Asynchronous completion engine
 " ==============================
