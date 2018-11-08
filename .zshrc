@@ -31,6 +31,9 @@ BULLETTRAIN_PROMPT_ORDER=(
     git
 )
 
+HISTSIZE=-1
+HISTFILESIZE=-1
+
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
@@ -205,7 +208,8 @@ git-extract-changes-to-file() {
 }
 
 tts() {
-    http --verbose get "http://zygfryd.avsystem.in:8000/play/tts/pl/$(python -c 'import urllib; import sys; print(urllib.quote(sys.stdin.read().strip()))' <<<"$*")"
+    local DOMAIN="${DOMAIN:-zygfryd.comp.avsystem.in}"
+    http --verbose get "http://$DOMAIN:8000/play/tts/pl/$(python -c 'import urllib; import sys; print(urllib.quote(sys.stdin.read().strip()))' <<<"$*")"
 }
 
 export KURWA='--conduit-uri=https://phabricator.avsystem.com'
