@@ -84,7 +84,14 @@ Plugin 'tpope/vim-characterize'
 
 " Utilities for working with Git repos
 " ====================================
+Plugin 'airblade/vim-gitgutter'
 Plugin 'tpope/vim-fugitive'
+
+let g:gitgutter_sign_added='┃'
+let g:gitgutter_sign_modified='┃'
+let g:gitgutter_sign_removed='◢'
+let g:gitgutter_sign_removed_first_line='◥'
+let g:gitgutter_sign_modified_removed='◢'
 
 " `.` support for actions introduced in some plugins
 " ==================================================
