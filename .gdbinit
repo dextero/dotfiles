@@ -5,8 +5,10 @@ dashboard assembly
 dashboard threads
 dashboard memory
 
+source ~/.gdb/GdbAsciiHexPrint/AsciiPrintCommand.py
 source ~/.gdb/offsets-of.py
 source ~/.gdb/stack-used.py
+source ~/.gdb/print-coap-packet.py
 
 set disassembly-flavor intel
 
