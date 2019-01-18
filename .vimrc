@@ -176,13 +176,12 @@ hi DiffChange ctermbg=100 guifg=#878700
 hi DiffDelete ctermbg=52 guifg=#5f0000
 
 " Highlight tabs and EOL whitespaces
-highlight default link EndOfLineSpace ErrorMsg
-highlight default link AnyTab ErrorMsg
-match EndOfLineSpace /\s\+$/
-match AnyTab /\t/
-autocmd InsertEnter * hi default link EndOfLineSpace Normal
-autocmd InsertLeave * hi default link EndOfLineSpace ErrorMsg
-
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/
+autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd BufWinLeave * call clearmatches()
 
 " Mappings
 " ========
