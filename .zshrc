@@ -197,14 +197,14 @@ git-extract-changes-to-file() {
         || { echo "Commit your changes first"; return 1 }
 
     git checkout @~1 "$@" \
-        && git commit -m "Extract $@ helper" \
+        && git commit -m "Extract $* helper" \
         && git revert --no-edit @ \
         && git reset @~1 \
         && git stash \
         && git reset @~1 \
         && git commit --amend -a --no-edit \
         && git stash pop \
-        && git commit -am "Extract changes to $@ from previous commit"
+        && git commit -am "Extract changes to $* from previous commit"
 }
 
 tts() {
