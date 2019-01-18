@@ -97,6 +97,12 @@ Plugin 'tpope/vim-surround'
 " ========================================
 Plugin 'vim-scripts/a.vim'
 
+" cscope code browser support
+" ===========================
+Plugin 'vim-scripts/cscope.vim'
+
+source $HOME/.vim/cscope_maps.vim
+
 " Extra features for writing ReStructuredText
 " ===========================================
 Plugin 'Rykka/riv.vim'

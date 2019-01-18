@@ -8,8 +8,8 @@ if [[ ! "$1" ]]; then
 fi
 
 TARGET="$1"
-IFACE="$2"
+IFACE="$1"
 shift 2
 FILTER="$@"
 
-ssh "$TARGET" "tcpdump -s0 -U -n -w - -i '$IFACE' '$FILTER'" | wireshark -k -i -
+ssh "$TARGET" -t "tcpdump -s0 -U -n -w - -i '$IFACE' '$FILTER'" | wireshark -k -i -
