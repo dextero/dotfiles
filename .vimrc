@@ -51,7 +51,7 @@ source $HOME/.vim/vundle.vimrc
 " Force 256-color mode
 set t_Co=256
 
-" Always display a status line 
+" Always display a status line
 set laststatus=2
 
 " Detect filetype, load appropriate plugins and indent.vim
