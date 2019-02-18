@@ -163,7 +163,7 @@ set hidden
 " Colorscheme tweaks
 " ==================
 
-colorscheme jelleybeans
+colorscheme jellybeans
 
 " Dim comments
 hi Normal ctermbg=None
@@ -182,6 +182,10 @@ autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
 autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhitespace /\s\+$/
 autocmd BufWinLeave * call clearmatches()
+
+hi default CocHighlightText ctermbg=240 guifg=#333333
+hi default link CocHighlightRead CocHighlightText
+hi default link CocHighlightWrite CocHighlightText
 
 " Mappings
 " ========
