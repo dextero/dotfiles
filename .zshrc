@@ -84,6 +84,8 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 
 source /etc/zsh_command_not_found
 
+export NPM_PACKAGES="$HOME/.npm-packages"
+
 export PATH=$HOME/bin/ccache:$PATH
 export PATH=$PATH:$HOME/.bin
 export PATH=$PATH:$HOME/bin
@@ -92,6 +94,11 @@ export PATH=$PATH:$HOME/arcanist/arcanist/bin
 export PATH=$PATH:$HOME/.gem/ruby/2.3.0/bin:$HOME/.gem/bin
 export PATH=$PATH:$HOME/.cargo/bin
 export PATH=$PATH:$HOME/.go/bin
+export PATH=$PATH:$HOME/.npm-packages/bin
+
+export MANPATH=$MANPATH:$NPM_PACKAGES/share/man
+
+export NODE_PATH=$NODE_PATH:$NPM_PACKAGES/lib/node_modules
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
