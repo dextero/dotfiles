@@ -40,9 +40,9 @@ endfunction
 nmap <C-p> :execute 'FZF' FindProjectRoot(expand('%:p'))<CR>
 
 
-" Load all plugins managed by Vundle
-" ==================================
-source $HOME/.vim/vundle.vimrc
+" Load all plugins managed by vim-plug
+" ====================================
+source $HOME/.vim/plug.vimrc
 
 
 " Settings
