@@ -192,7 +192,7 @@ function! ToggleColorColumn()
     endif
 endfunction
 
-highlight ColorColumn ctermbg=233 guibg=#555555
+highlight ColorColumn ctermbg=234 guibg=#555555
 nmap \8 :call ToggleColorColumn()<CR>
 
 " Make j/k move to next visual line instead of physical line

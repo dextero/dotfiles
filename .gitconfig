@@ -1,3 +1,5 @@
 [user]
 	email = marcin@mradomski.pl
 	name = Marcin Radomski
+[rerere]
+	enabled = 1
