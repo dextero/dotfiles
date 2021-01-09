@@ -2,7 +2,7 @@
 	sslCAInfo = /home/marcin/.certs/all.crt
 	sslVerify = false
 [user]
-	email = m.radomski@avsystem.com
+	email = marcin@mradomski.pl
 	name = Marcin Radomski
 [color]
 	ui = true

@@ -1,5 +1,6 @@
 {
     "coc.preferences.colorSupport": false,
+    "python.jediEnabled": false,
     "languageserver": {
         "ccls": {
             "command": "ccls",

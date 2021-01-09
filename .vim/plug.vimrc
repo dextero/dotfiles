@@ -132,7 +132,9 @@ Plug 'lyuts/vim-rtags'
 
 " Language Server Protocol client
 " ===============================
-Plug 'neoclide/coc.nvim', {'tag': '*', 'do': { -> coc#util#install()}}
+" see https://github.com/neoclide/coc.nvim/wiki/F.A.Q#how-to-use-cocnvim-from-master-branch
+Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+let g:coc_force_debug = 1
 
 " if hidden not set, TextEdit might fail.
 set hidden

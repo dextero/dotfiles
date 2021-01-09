@@ -91,9 +91,9 @@ export PATH=$PATH:$HOME/.bin
 export PATH=$PATH:$HOME/bin
 export PATH=$PATH:$HOME/.local/bin
 export PATH=$PATH:$HOME/arcanist/arcanist/bin
-export PATH=$PATH:$HOME/.gem/ruby/2.3.0/bin:$HOME/.gem/bin
+export PATH=$PATH:$HOME/.gem/ruby/2.5.0/bin:$HOME/.gem/bin
 export PATH=$PATH:$HOME/.cargo/bin
-export PATH=$PATH:$HOME/.go/bin
+export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/.npm-packages/bin
 
 export MANPATH=$MANPATH:$NPM_PACKAGES/share/man
@@ -127,7 +127,7 @@ DEBFULLNAME="Marcin Radomski"
 DEFAULT_USER=marcin
 
 # Always use 256-color mode
-export TERM=xterm-256color
+export TERM=tmux-256color
 alias tmux="/usr/bin/tmux -2"
 
 # Store core dumps by default
@@ -138,6 +138,7 @@ unalias glg
 alias glg="git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit"
 alias gstl="git stash list --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue) <%an>%Creset' --abbrev-commit"
 alias gsuir="git submodule update --init --recursive"
+gssuir() { git submodule sync; gsuir }
 
 # Install FZF if required
 [[ -d ~/.fzf ]] || {
