@@ -52,7 +52,7 @@ let g:syntastic_python_python_exec = 'python3 -m py_compile'
 let g:syntastic_python_flake8_args = '--max-line-length=119'
 
 let g:syntastic_python_python_exe = 'python3 -m py_compile'
-let g:syntastic_python_pylint_exe = 'pylint3'
+let g:syntastic_python_pylint_exe = 'pylint'
 
 " Force checking headers as well
 let g:syntastic_c_check_header = 1
@@ -111,13 +111,6 @@ Plug 'rhysd/vim-clang-format'
 " Auto-format on save
 "autocmd FileType c,cpp ClangFormatAutoEnable
 
-" Vim configuration for Rust
-" ==========================
-Plug 'rust-lang/rust.vim'
-
-" Auto-format on save
-let g:rustfmt_autosave = 1
-
 " Quickfix list filtering
 " =======================
 Plug 'sk1418/QFGrep'
@@ -130,134 +123,6 @@ Plug 'PProvost/vim-ps1'
 " =========================
 Plug 'lyuts/vim-rtags'
 
-" Language Server Protocol client
-" ===============================
-" see https://github.com/neoclide/coc.nvim/wiki/F.A.Q#how-to-use-cocnvim-from-master-branch
-Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
-let g:coc_force_debug = 1
-
-" if hidden not set, TextEdit might fail.
-set hidden
-
-" Better display for messages
-set cmdheight=2
-
-" Smaller updatetime for CursorHold & CursorHoldI
-set updatetime=300
-
-" don't give |ins-completion-menu| messages.
-set shortmess+=c
-
-" always show signcolumns
-set signcolumn=yes
-
-" Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-function! s:check_back_space() abort
-  let col = col('.') - 1
-  return !col || getline('.')[col - 1]  =~# '\s'
-endfunction
-
-" Use <c-space> for trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-
-" Use <cr> for confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" Use `[c` and `]c` for navigate diagnostics
-nmap <silent> [c <Plug>(coc-diagnostic-prev)
-nmap <silent> ]c <Plug>(coc-diagnostic-next)
-
-" Remap keys for gotos
-nmap <silent> <C-]> <Plug>(coc-definition)
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Use K for show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
-
-function! s:show_documentation()
-  if &filetype == 'vim'
-    execute 'h '.expand('<cword>')
-  else
-    call CocAction('doHover')
-  endif
-endfunction
-
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
-
-" Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
-
-" Remap for format selected region
-vmap <leader>f  <Plug>(coc-format-selected)
-nmap <leader>f  <Plug>(coc-format-selected)
-
-augroup mygroup
-  autocmd!
-  " Setup formatexpr specified filetype(s).
-  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
-  " Update signature help on jump placeholder
-  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
-augroup end
-
-" Remap for do codeAction of selected region, ex: `<leader>aap` for current paragraph
-vmap <leader>a  <Plug>(coc-codeaction-selected)
-nmap <leader>a  <Plug>(coc-codeaction-selected)
-
-" Remap for do codeAction of current line
-nmap <leader>ac  <Plug>(coc-codeaction)
-" Fix autofix problem of current line
-nmap <leader>qf  <Plug>(coc-fix-current)
-
-" Use `:Format` for format current buffer
-command! -nargs=0 Format :call CocAction('format')
-
-" Use `:Fold` for fold current buffer
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" Using CocList
-" Show all diagnostics
-nnoremap <silent> <space>a  :<C-u>CocList diagnostics<cr>
-" Manage extensions
-nnoremap <silent> <space>e  :<C-u>CocList extensions<cr>
-" Show commands
-nnoremap <silent> <space>c  :<C-u>CocList commands<cr>
-" Find symbol of current document
-nnoremap <silent> <space>o  :<C-u>CocList outline<cr>
-" Search workspace symbols
-nnoremap <silent> <space>s  :<C-u>CocList -I symbols<cr>
-" Do default action for next item.
-nnoremap <silent> <space>j  :<C-u>CocNext<CR>
-" Do default action for previous item.
-nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
-" Resume latest coc list
-nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
-
-" Asynchronous completion engine
-" ==============================
-" TODO: requires manual `pip3 install neovim`
-"if has('nvim')
-"  Plug 'Shougo/deoplete.nvim'
-"else
-"  Plug 'Shougo/deoplete.nvim'
-"  Plug 'roxma/nvim-yarp'
-"  Plug 'roxma/vim-hug-neovim-rpc'
-"endif
-"
-"let g:deoplete#enable_at_startup = 1
-"inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-
 " Function signature in command line
 " ==================================
 Plug 'Shougo/echodoc.vim'
@@ -268,10 +133,168 @@ Plug 'majutsushi/tagbar'
 
 " Mark uncommitted changes in gutter
 " ==================================
-Plug 'airblade/vim-gitgutter'
+"Plug 'airblade/vim-gitgutter'
 
 " Table of contents generator for Markdown
 " ========================================
 Plug 'mzlogin/vim-markdown-toc'
+Plug 'junegunn/vim-easy-align'
+
+au FileType markdown vmap <Leader><Bslash> :EasyAlign*<Bar><Enter>
+
+" Rust stuff
+" ==========
+
+" source: https://github.com/sharksforarms/vim-rust/blob/master/neovim-init-lsp-cmp-rust-tools.vim
+" Collection of common configurations for the Nvim LSP client
+Plug 'neovim/nvim-lspconfig'
+
+" Autocompletion framework
+Plug 'hrsh7th/nvim-cmp', { 'branch': 'main' }
+" cmp LSP completion
+Plug 'hrsh7th/cmp-nvim-lsp', { 'branch': 'main' }
+" cmp Snippet completion
+Plug 'hrsh7th/cmp-vsnip', { 'branch': 'main' }
+" cmp Path completion
+Plug 'hrsh7th/cmp-path', { 'branch': 'main' }
+Plug 'hrsh7th/cmp-buffer', { 'branch': 'main' }
+" See hrsh7th other plugins for more great completion sources!
+
+" Adds extra functionality over rust analyzer
+Plug 'simrat39/rust-tools.nvim'
+autocmd FileType rs setf rust
+
+" Snippet engine
+Plug 'hrsh7th/vim-vsnip'
+
+" Optional
+Plug 'nvim-lua/popup.nvim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+
+" ActivityWatch watcher
+"Plug 'ActivityWatch/aw-watcher-vim'
 
 call plug#end()
+
+if has('nvim')
+    " Set completeopt to have a better completion experience
+    " :help completeopt
+    " menuone: popup even when there's only one match
+    " noinsert: Do not insert text until a selection is made
+    " noselect: Do not select, force user to select one from the menu
+    set completeopt=menuone,noinsert,noselect
+
+    " Avoid showing extra messages when using completion
+    set shortmess+=c
+
+    " Configure LSP through rust-tools.nvim plugin.
+    " rust-tools will configure and enable certain LSP features for us.
+    " See https://github.com/simrat39/rust-tools.nvim#configuration
+    lua <<EOF
+
+    -- nvim_lsp object
+    require'lspconfig'
+    require'lspconfig'.clangd.setup{}
+
+    local opts = {
+        tools = {
+            autoSetHints = true,
+            hover_with_actions = true,
+            runnables = {
+                use_telescope = true
+            },
+            inlay_hints = {
+                show_parameter_hints = false,
+                parameter_hints_prefix = "",
+                other_hints_prefix = "",
+            },
+        },
+
+        -- all the opts to send to nvim-lspconfig
+        -- these override the defaults set by rust-tools.nvim
+        -- see https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md#rust_analyzer
+        server = {
+            -- on_attach is a callback called when the language server attachs to the buffer
+            -- on_attach = on_attach,
+            settings = {
+                -- to enable rust-analyzer settings visit:
+                -- https://github.com/rust-analyzer/rust-analyzer/blob/master/docs/user/generated_config.adoc
+                ["rust-analyzer"] = {
+                    -- enable clippy on save
+                    checkOnSave = {
+                        command = "clippy"
+                    },
+                }
+            }
+        },
+    }
+
+    require('rust-tools').setup(opts)
+EOF
+
+    " Code navigation shortcuts
+    " as found in :help lsp
+    nnoremap <silent> <c-]> <cmd>lua vim.lsp.buf.definition()<CR>
+    nnoremap <silent> K     <cmd>lua vim.lsp.buf.hover()<CR>
+    nnoremap <silent> gD    <cmd>lua vim.lsp.buf.implementation()<CR>
+    nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+    nnoremap <silent> 1gD   <cmd>lua vim.lsp.buf.type_definition()<CR>
+    nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
+    nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
+    nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
+    nnoremap <silent> gd    <cmd>lua vim.lsp.buf.definition()<CR>
+
+    " Quick-fix
+    nnoremap <silent> ga    <cmd>lua vim.lsp.buf.code_action()<CR>
+
+    " Setup Completion
+    " See https://github.com/hrsh7th/nvim-cmp#basic-configuration
+    lua <<EOF
+    local cmp = require'cmp'
+    cmp.setup({
+      snippet = {
+        expand = function(args)
+            vim.fn["vsnip#anonymous"](args.body)
+        end,
+      },
+      mapping = {
+        ['<C-p>'] = cmp.mapping.select_prev_item(),
+        ['<C-n>'] = cmp.mapping.select_next_item(),
+        -- Add tab support
+        ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+        ['<Tab>'] = cmp.mapping.select_next_item(),
+        ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.close(),
+        ['<CR>'] = cmp.mapping.confirm({
+          behavior = cmp.ConfirmBehavior.Insert,
+          select = true,
+        })
+      },
+
+      -- Installed sources
+      sources = {
+        { name = 'nvim_lsp' },
+        { name = 'vsnip' },
+        { name = 'path' },
+        { name = 'buffer' },
+      },
+    })
+EOF
+
+    " have a fixed column for the diagnostics to appear in
+    " this removes the jitter when warnings/errors flow in
+    set signcolumn=yes
+
+    " Set updatetime for CursorHold
+    " 300ms of no cursor movement to trigger CursorHold
+    set updatetime=300
+    " Show diagnostic popup on cursor hover
+    autocmd CursorHold * lua vim.diagnostic.show()
+
+    " Goto previous/next diagnostic warning/error
+    nnoremap <silent> g[ <cmd>lua vim.diagnostic.goto_prev()<CR>
+    nnoremap <silent> g] <cmd>lua vim.diagnostic.goto_next()<CR>
+endif
