@@ -134,7 +134,7 @@ export PATH=$PATH:$HOME/.bin
 export PATH=$PATH:$HOME/bin
 export PATH=$PATH:$HOME/.local/bin
 export PATH=$PATH:$HOME/arcanist/arcanist/bin
-export PATH=$PATH:$HOME/.gem/ruby/2.5.0/bin:$HOME/.gem/bin
+export PATH=$PATH:$HOME/.gem/ruby/3.0.0/bin:$HOME/.gem/bin
 export PATH=$PATH:$HOME/.cargo/bin
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/.npm-packages/bin
@@ -182,6 +182,7 @@ alias glg="git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d
 alias gstl="git stash list --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue) <%an>%Creset' --abbrev-commit"
 alias gsuir="git submodule update --init --recursive"
 gssuir() { git submodule sync; gsuir }
+alias gcamane="git commit --amend -a --no-edit"
 
 # Install FZF if required
 [[ -d ~/.fzf ]] || {
@@ -260,10 +261,9 @@ git-extract-changes-to-file() {
 
 tts() {
     local DOMAIN="${DOMAIN:-zygfryd.comp.avsystem.in}"
-    http --verbose get "http://$DOMAIN:8000/play/tts/pl/$(python -c 'import urllib; import sys; print(urllib.quote(sys.stdin.read().strip()))' <<<"$*")"
+    http --verbose get "http://$DOMAIN:8000/play/tts/pl/$(python3 -c 'import urllib; import sys; print(urllib.quote(sys.stdin.read().strip()))' <<<"$*")"
 }
 
-export KURWA='--conduit-uri=https://phabricator.avsystem.com'
 export CMAKE_BULLSHIT=(CMakeCache.txt CMakeFiles CPackConfig.cmake CPackSourceConfig CMakeScripts Testing CTestTestfile.cmake Makefile cmake_install.cmake install_manifest.txt compile_commands.json)
 export SBT_OPTS="-Xmx4G -XX:+UseG1GC -XX:+CMSClassUnloadingEnabled -Xss2M"
 
@@ -272,3 +272,12 @@ if [ -f '/usr/bin/valgrind' ]; then
 elif [ -f '/usr/local/bin/valgrind' ]; then
     export VALGRIND="/usr/local/bin/valgrind --leak-check=full --track-origins=yes -q --error-exitcode=63 --suppressions=$HOME/projects/libcwmp/libcwmp_test.supp"
 fi
+
+# OPAM configuration
+. /home/dex/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+
+source /home/dex/.config/broot/launcher/bash/br
+
+esp32-enable() {
+    . /home/dex/export-esp.sh
+}
