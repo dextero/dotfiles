@@ -51,6 +51,20 @@ class Nextcloud:
 
     def get_share_link(self,
                        remote_path: str) -> str:
+        response = requests.get(f'{self.ocs_path}/shares',
+                                params={
+                                    'path': remote_path,
+                                },
+                                auth=(self.user, self.password),
+                                headers={
+                                    'OCS-APIRequest': 'true'
+                                })
+        if response:
+            tree = ElementTree.fromstring(response.text)
+            url = tree.find('./data/element/url')
+            if url:
+                return url.text
+
         response = requests.post(f'{self.ocs_path}/shares',
                                  data={
                                      'path': remote_path,
