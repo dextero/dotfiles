@@ -18,17 +18,60 @@ BULLETTRAIN_CONTEXT_SHOW=true
 BULLETTRAIN_CONTEXT_DEFAULT_USER=marcin
 BULLETTRAIN_CONTEXT_BG=234 # dark grey
 
+source "$HOME/.oh-my-zsh/custom/zsh-async/async.zsh"
+
+_async_git_prompt_ready() {
+    BULLETTRAIN_ASYNC_GIT_RESULT="${@[3]}"
+    if [[ -z "$BULLETTRAIN_ASYNC_GIT_RESULT" ]]; then
+        BULLETTRAIN_ASYNC_GIT_RESULT_EMPTY=1
+    fi
+    zle reset-prompt
+    unset BULLETTRAIN_ASYNC_GIT_RESULT_EMPTY
+    unset BULLETTRAIN_ASYNC_GIT_RESULT
+}
+
+_async_git_prompt_build() {
+    cd "$1"
+    source "$ZSH/oh-my-zsh.sh"
+    source "$ZSH/custom/bullet-train.zsh-theme"
+    prompt_git
+}
+
+async_init
+async_start_worker async_git_prompt_worker
+async_register_callback async_git_prompt_worker _async_git_prompt_ready
+
+prompt_async_git() {
+    if [[ "$BULLETTRAIN_ASYNC_GIT_RESULT_EMPTY" ]]; then
+        return
+    elif [[ "$BULLETTRAIN_ASYNC_GIT_RESULT" ]]; then
+        prompt_segment $BULLETTRAIN_GIT_BG $BULLETTRAIN_GIT_FG "$BULLETTRAIN_ASYNC_GIT_RESULT"
+    else
+        prompt_segment $BULLETTRAIN_GIT_BG $BULLETTRAIN_GIT_FG "⏳"
+        async_job async_git_prompt_worker _async_git_prompt_build "$PWD"
+    fi
+}
+
+prompt_esp_rust() {
+  if ! [[ "$LIBCLANG_PATH" =~ ".*/xtensa-esp32.*" ]]; then
+    return
+  fi
+
+  prompt_segment yellow black "esp-rust"
+}
+
 BULLETTRAIN_PROMPT_ORDER=(
     time
     status
     custom
     context
     dir
+    esp_rust
     perl
     ruby
     virtualenv
     go
-    git
+    async_git
 )
 
 HISTSIZE=-1
