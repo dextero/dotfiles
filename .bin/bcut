@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Extracts $2 bytes from STDIN starting at offset $1
+dd if=/dev/stdin of=/dev/stdout bs=1 skip="$1" count="$2" 2>/dev/null

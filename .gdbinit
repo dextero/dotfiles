@@ -1,10 +1,11 @@
 source ~/.gdb/gdb-dashboard/.gdbinit
+dashboard source -style context 20
+dashboard expressions
+dashboard assembly
+dashboard threads
+dashboard memory
 
-#python
-#import sys
-#sys.path.append('/home/dex/.config/Epic/GDBPrinters/')
-#from UE4Printers import register_ue4_printers
-#register_ue4_printers(None)
-#print("Registered pretty printers for UE4 classes")
-#end
-#source /home/dex/tools/pwndbg/gdbinit.py
+source ~/.gdb/offsets-of.py
+source ~/.gdb/stack-used.py
+
+set disassembly-flavor intel

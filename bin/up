@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import requests
+import sys
+from xml.etree import ElementTree
+
+import webdav3.client
+import toml
+from config_path import ConfigPath
+
+class Nextcloud:
+    def __init__(self,
+                 hostname: str,
+                 user: str,
+                 password: str,
+                 default_upload_dir: str = None):
+        self.hostname = hostname
+        self.user = user
+        self.password = password
+        self.default_upload_dir = default_upload_dir
+        self.webdav_client = webdav3.client.Client({
+            'webdav_hostname': self.webdav_path,
+            'webdav_login': self.user,
+            'webdav_password': self.password,
+        })
+
+    @property
+    def webdav_path(self):
+        return f'{self.hostname}/remote.php/dav/files/{self.user}'
+
+    @property
+    def ocs_path(self):
+        return f'{self.hostname}/ocs/v2.php/apps/files_sharing/api/v1'
+
+    def upload_file(self,
+                    local_path: str,
+                    remote_path: str = None,
+                    overwrite: bool = False) -> str:
+        file_name = os.path.basename(local_path)
+
+        if not remote_path:
+            remote_path = os.path.join(self.default_upload_dir, file_name)
+
+        if not overwrite and self.webdav_client.check(remote_path):
+            raise FileExistsError(f'{remote_path} already exists')
+
+        self.webdav_client.upload_file(remote_path, local_path)
+        return remote_path
+
+    def get_share_link(self,
+                       remote_path: str) -> str:
+        response = requests.get(f'{self.ocs_path}/shares',
+                                params={
+                                    'path': remote_path,
+                                },
+                                auth=(self.user, self.password),
+                                headers={
+                                    'OCS-APIRequest': 'true'
+                                })
+        if response:
+            tree = ElementTree.fromstring(response.text)
+            url = tree.find('./data/element/url')
+            if url:
+                return url.text
+
+        response = requests.post(f'{self.ocs_path}/shares',
+                                 data={
+                                     'path': remote_path,
+                                     'shareType': 3, # public link
+                                 },
+                                 auth=(self.user, self.password),
+                                 headers={
+                                     'OCS-APIRequest': 'true'
+                                 })
+        tree = ElementTree.fromstring(response.text)
+        return tree.find('./data/url').text
+
+parser = argparse.ArgumentParser('Upload file(s) to Nextcloud and generate share links.')
+parser.add_argument('file', nargs='+', type=str, help='File path(s) to upload.')
+parser.add_argument('--force', '-f', action='store_true', help='Overwrite existing files without prompting.')
+args = parser.parse_args()
+
+class ConfigFile:
+    def __init__(self):
+        self._config_path = ConfigPath('mradomski.pl', 'up', '.toml')
+        self._path = self._config_path.readFilePath()
+        self.data = None
+
+        if self._path:
+            self.load()
+        else:
+            self.initialize()
+
+    def initialize(self):
+        self._path = self._config_path.saveFilePath(mkdir=True)
+
+        print(f'Config file ({self._path}) not found, performing one-time initialization')
+        self.data = {}
+        self.data['hostname'] = input('Nextcloud url (e.g. https://example.com/): ')
+        self.data['user'] = input('Nextcloud username: ')
+        self.data['password'] = input(f'Nextcloud password (generate at {self.data["hostname"]}/settings/user/security): ')
+        self.data['upload_dir'] = input('Where to upload files: (e.g. /some/dir): ')
+
+        self.save()
+
+    def load(self):
+        self.data = {}
+        with open(self._path) as f:
+            self.data = toml.loads(f.read())
+
+    def save(self):
+        with open(self._path, 'w') as f:
+            f.write(toml.dumps(self.data))
+
+config = ConfigFile()
+nc = Nextcloud(hostname=config.data["hostname"],
+               user=config.data["user"],
+               password=config.data["password"],
+               default_upload_dir=config.data["upload_dir"])
+
+for local_path in args.file:
+    share_link = nc.get_share_link(nc.upload_file(local_path, overwrite=args.force))
+    print(f'{local_path}\t{share_link}')

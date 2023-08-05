@@ -10,21 +10,72 @@ export ZSH=$HOME/.oh-my-zsh
 ZSH_THEME="bullet-train"
 
 BULLETTRAIN_PROMPT_CHAR="$"
+
 BULLETTRAIN_STATUS_EXIT_SHOW=true
+BULLETTRAIN_STATUS_BG=22 # dark green
+
+BULLETTRAIN_CONTEXT_SHOW=true
+BULLETTRAIN_CONTEXT_DEFAULT_USER=marcin
+BULLETTRAIN_CONTEXT_BG=234 # dark grey
+
+source "$HOME/.oh-my-zsh/custom/zsh-async/async.zsh"
+
+_async_git_prompt_ready() {
+    BULLETTRAIN_ASYNC_GIT_RESULT="${@[3]}"
+    if [[ -z "$BULLETTRAIN_ASYNC_GIT_RESULT" ]]; then
+        BULLETTRAIN_ASYNC_GIT_RESULT_EMPTY=1
+    fi
+    zle reset-prompt
+    unset BULLETTRAIN_ASYNC_GIT_RESULT_EMPTY
+    unset BULLETTRAIN_ASYNC_GIT_RESULT
+}
+
+_async_git_prompt_build() {
+    cd "$1"
+    source "$ZSH/oh-my-zsh.sh"
+    source "$ZSH/custom/bullet-train.zsh-theme"
+    prompt_git
+}
+
+async_init
+async_start_worker async_git_prompt_worker
+async_register_callback async_git_prompt_worker _async_git_prompt_ready
+
+prompt_async_git() {
+    if [[ "$BULLETTRAIN_ASYNC_GIT_RESULT_EMPTY" ]]; then
+        return
+    elif [[ "$BULLETTRAIN_ASYNC_GIT_RESULT" ]]; then
+        prompt_segment $BULLETTRAIN_GIT_BG $BULLETTRAIN_GIT_FG "$BULLETTRAIN_ASYNC_GIT_RESULT"
+    else
+        prompt_segment $BULLETTRAIN_GIT_BG $BULLETTRAIN_GIT_FG "⏳"
+        async_job async_git_prompt_worker _async_git_prompt_build "$PWD"
+    fi
+}
+
+prompt_esp_rust() {
+  if ! [[ "$LIBCLANG_PATH" =~ ".*/xtensa-esp32.*" ]]; then
+    return
+  fi
+
+  prompt_segment yellow black "esp-rust"
+}
+
 BULLETTRAIN_PROMPT_ORDER=(
     time
     status
     custom
     context
     dir
+    esp_rust
     perl
     ruby
     virtualenv
-    aws
     go
-    git
+    async_git
 )
 
+HISTSIZE=-1
+HISTFILESIZE=-1
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
@@ -71,9 +122,27 @@ plugins=(git zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
 
-export PATH=$PATH:$HOME/.cabal/bin:$HOME/bin:$HOME/.local/bin:$HOME/.gem/ruby/2.3.0/bin
+source /etc/zsh_command_not_found
+
+export NPM_PACKAGES="$HOME/.npm-packages"
+
+export PATH=$HOME/bin/ccache:$PATH
+export PATH=$PATH:$HOME/.bin
+export PATH=$PATH:$HOME/bin
+export PATH=$PATH:$HOME/.local/bin
+export PATH=$PATH:$HOME/arcanist/arcanist/bin
+export PATH=$PATH:$HOME/.gem/ruby/3.0.0/bin:$HOME/.gem/bin
+export PATH=$PATH:$HOME/.cargo/bin
+export PATH=$PATH:$HOME/go/bin
+export PATH=$PATH:$HOME/.npm-packages/bin
+
+export MANPATH=$MANPATH:$NPM_PACKAGES/share/man
+
+export NODE_PATH=$NODE_PATH:$NPM_PACKAGES/lib/node_modules
+
 # export MANPATH="/usr/local/man:$MANPATH"
 
 # You may need to manually set your language environment
@@ -101,7 +170,7 @@ DEBFULLNAME="Marcin Radomski"
 DEFAULT_USER=marcin
 
 # Always use 256-color mode
-export TERM=xterm-256color
+export TERM=tmux-256color
 alias tmux="/usr/bin/tmux -2"
 
 # Store core dumps by default
@@ -110,7 +179,10 @@ ulimit -c unlimited
 # Git aliases
 unalias glg
 alias glg="git log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue)<%an>%Creset' --abbrev-commit"
+alias gstl="git stash list --color --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr)%C(bold blue) <%an>%Creset' --abbrev-commit"
 alias gsuir="git submodule update --init --recursive"
+gssuir() { git submodule sync; gsuir }
+alias gcamane="git commit --amend -a --no-edit"
 
 # Install FZF if required
 [[ -d ~/.fzf ]] || {
@@ -132,4 +204,75 @@ mac2ipv6 () {
   local mac=$1 byte0
   printf %02x -v byte0 $((0x${mac:0:2} ^ 2)) >/dev/null
   echo "fe80::$byte0${mac:3:5}ff:fe${mac:9:5}${mac:15:2}"
+}
+
+# Non-destructive rm
+alias RM='/bin/rm'
+TRASH_DIR="$HOME/trash"
+
+rm() {
+    TIMESTAMP=`date +'%s'`
+    DEST_DIR="$TRASH_DIR/$TIMESTAMP/"
+    [ -e "$DEST_DIR" ] || mkdir -p "$DEST_DIR"
+
+    local -a RM_ARGS
+    RM_ARGS=()
+    for ARG in $@; do
+        if [ "$ARG" != '-rf' ]; then
+            if [ "${ARG:0:1}" = '-' ]; then
+                echo "unknown option: $ARG, use /bin/rm"
+            fi
+
+            RM_ARGS+=("$ARG")
+        fi
+    done
+
+    mv ${RM_ARGS[@]} "$DEST_DIR"
+}
+
+# Git helpers
+rebase-cascade() {
+    while [[ $# -gt 1 ]]; do
+        local BASE=$1
+        local TOP=$2
+
+        git checkout $TOP || return 1
+        git rebase $BASE || return 1
+        shift
+    done
+}
+
+git-extract-changes-to-file() {
+    [[ "$@" ]] \
+        || { echo "Usage: $0 FILES..."; return 1 }
+    git diff-index --quiet @ -- \
+        || { echo "Commit your changes first"; return 1 }
+
+    git checkout @~1 "$@" \
+        && git commit -m "Extract $* helper" \
+        && git revert --no-edit @ \
+        && git reset @~1 \
+        && git stash \
+        && git reset @~1 \
+        && git commit --amend -a --no-edit \
+        && git stash pop \
+        && git commit -am "Extract changes to $* from previous commit"
+}
+
+export CMAKE_BULLSHIT=(CMakeCache.txt CMakeFiles CPackConfig.cmake CPackSourceConfig CMakeScripts Testing CTestTestfile.cmake Makefile cmake_install.cmake install_manifest.txt compile_commands.json)
+export SBT_OPTS="-Xmx4G -XX:+UseG1GC -XX:+CMSClassUnloadingEnabled -Xss2M"
+
+if [ -f '/usr/bin/valgrind' ]; then
+    export VALGRIND="/usr/bin/valgrind --leak-check=full --track-origins=yes -q --error-exitcode=63 --suppressions=$HOME/projects/libcwmp/libcwmp_test.supp"
+elif [ -f '/usr/local/bin/valgrind' ]; then
+    export VALGRIND="/usr/local/bin/valgrind --leak-check=full --track-origins=yes -q --error-exitcode=63 --suppressions=$HOME/projects/libcwmp/libcwmp_test.supp"
+fi
+
+# OPAM configuration
+. /home/dex/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
+
+source /home/dex/.config/broot/launcher/bash/br
+
+esp32-enable() {
+    . /home/dex/export-esp.sh
 }

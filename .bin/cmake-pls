@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+set -e
+set -o pipefail
+
+# distro specific functions; should be overridden if necessary
+find-packages-by-files() {
+    # input: list of missing CMake config filenames passed as arguments
+    # output: whitespace-separated list of packages that contain the file
+    apt-file search -l
+}
+
+find-packages-by-names() {
+    # input: name of the missing library, as passed to find_package()
+    # output: whitespace-separated list of packages that match the name
+    for ARG; do
+        apt-cache search "$ARG.*-dev" | awk '{print $1}'
+    done
+}
+
+install-package() {
+    # input: name of the package to install
+    sudo apt install "$1"
+}
+# end of distro-specific functions
+
+if [[ "$1" == "--help" || "$#" -eq 0 ]]; then
+    cat <<EOF | groff -man -Tascii
+.TH $(basename $0) 1 "27 March 2019"
+.SH NAME
+$(basename $0) - rerun CMake until successful
+
+.SH SYNOPSIS
+\fB$(basename $0)\fR [ CMake flags... ]
+
+.SH DESCRIPTION
+Reruns CMake with given arguments as long as any missing package warnings are found. Attempt to detect package containing missing CMake config file at each step and invoke system package manager for the package.
+EOF
+    exit 1
+fi
+
+prompt() {
+    echo -n "$@"' [Y/n] '
+    read CHOICE
+    case "$CHOICE" in
+        ""|y*|Y*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+TMPFILE="$(mktemp)"
+trap "rm '$TMPFILE'" EXIT
+
+while true; do
+    ! cmake "$@" 2>&1 | tee "$TMPFILE"
+
+    echo ""
+    if grep -E '^\s*Could not find a package configuration file' "$TMPFILE"; then
+        echo ""
+        PKG_CANDIDATES=$(grep -E "^\s+\b\w+[.]cmake$" "$TMPFILE" \
+                              | xargs find-packages-by-files)
+    elif grep -E '^\s*Could NOT find' "$TMPFILE"; then
+        echo ""
+        PKG_CANDIDATES=$(find-packages-by-names "$(awk '/^\s*Could NOT find/ {print $4}' "$TMPFILE")")
+    else
+        break
+    fi
+
+    if [[ -z "$PKG_CANDIDATES" ]]; then
+        echo 'No candidate packages found!'
+        exit 1
+    fi
+
+    for PKG_NAME in $PKG_CANDIDATES; do
+        if prompt "Install $PKG_NAME?"; then
+            install-package "$PKG_NAME"
+            break
+        fi
+    done
+done

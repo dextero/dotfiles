@@ -40,9 +40,9 @@ endfunction
 nmap <C-p> :execute 'FZF' FindProjectRoot(expand('%:p'))<CR>
 
 
-" Load all plugins managed by Vundle
-" ==================================
-source $HOME/.vim/vundle.vimrc
+" Load all plugins managed by vim-plug
+" ====================================
+source $HOME/.vim/plug.vimrc
 
 
 " Settings
@@ -51,7 +51,7 @@ source $HOME/.vim/vundle.vimrc
 " Force 256-color mode
 set t_Co=256
 
-" Always display a status line 
+" Always display a status line
 set laststatus=2
 
 " Detect filetype, load appropriate plugins and indent.vim
@@ -66,8 +66,10 @@ set tabstop=4
 set shiftwidth=4
 set expandtab
 
-au BufNewFile,BufRead *.tex setlocal tabstop=2 shiftwidth=2
-au BufNewFile,BufRead *.sls setlocal tabstop=2 shiftwidth=2 " Saltstack state files
+augroup vimrc_indent
+    au BufNewFile,BufRead *.tex setlocal tabstop=2 shiftwidth=2
+    au BufNewFile,BufRead *.sls setlocal tabstop=2 shiftwidth=2 " Saltstack state files
+augroup END
 
 " Auto-indent code
 set autoindent
@@ -126,8 +128,13 @@ syntax on
 set cursorline
 set cursorcolumn
 
+" Auto-detect and apply vim modeline in files
+set modeline
+
 " Recursive cwd search on `gf`, `:find` etc.
 set path+=**
+" Also search system include directories
+let &path=&path . ',' . system("cc -E -Wp,-v - </dev/null 2>&1 | awk '/^ /{print $1}' | paste -sd,")
 
 " Persistent undo
 set undofile
@@ -135,11 +142,15 @@ set undodir=$HOME/.vim/undo
 set undolevels=1000
 set undoreload=10000
 
+" Shorten displayed messages
+set shortmess=a
+
+" Use tree-view style of opened directories
 let g:netrw_liststyle=3
 
 " Fix slight delay after pressing <Esc>O
 " http://ksjoberg.com/vim-esckeys.html
-set timeout timeoutlen=1000 ttimeoutlen=100
+"set timeout timeoutlen=1000 ttimeoutlen=100
 
 " Always show the signcolumn; see :h signs
 " deoplete + LSC derp hard without this
@@ -152,7 +163,7 @@ set hidden
 " Colorscheme tweaks
 " ==================
 
-colorscheme jelleybeans
+colorscheme jellybeans
 
 " Dim comments
 hi Normal ctermbg=None
@@ -165,13 +176,16 @@ hi DiffChange ctermbg=100 guifg=#878700
 hi DiffDelete ctermbg=52 guifg=#5f0000
 
 " Highlight tabs and EOL whitespaces
-highlight default link EndOfLineSpace ErrorMsg
-highlight default link AnyTab ErrorMsg
-match EndOfLineSpace /\s\+$/
-match AnyTab /\t/
-autocmd InsertEnter * hi default link EndOfLineSpace Normal
-autocmd InsertLeave * hi default link EndOfLineSpace ErrorMsg
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+$/
+autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd BufWinLeave * call clearmatches()
 
+hi default CocHighlightText ctermbg=240 guifg=#333333
+hi default link CocHighlightRead CocHighlightText
+hi default link CocHighlightWrite CocHighlightText
 
 " Mappings
 " ========
@@ -183,17 +197,18 @@ autocmd InsertLeave * hi default link EndOfLineSpace ErrorMsg
 " Fix broken syntax coloring
 inoremap <F9> <C-o>:syntax sync fromstart<CR>
 
-" Highlight 80. column
-function! ToggleColorColumn()
-    if (&l:colorcolumn > 0)
+" Highlight columns after specified one
+function! ToggleColorColumn(col)
+    if (&l:colorcolumn =~ '^'.a:col.',')
         set colorcolumn=0
     else
-        let &colorcolumn=join(range(81,999),",")
+        let &colorcolumn=join(range(a:col,999),",")
     endif
 endfunction
 
 highlight ColorColumn ctermbg=234 guibg=#555555
-nmap \8 :call ToggleColorColumn()<CR>
+nmap \8 :call ToggleColorColumn(80)<CR>
+nmap \0 :call ToggleColorColumn(120)<CR>
 
 " Make j/k move to next visual line instead of physical line
 " http://yubinkim.com/?p=6
@@ -233,3 +248,11 @@ nmap ]q :cnext<CR>
 " Tag list
 nmap ]t :tnext<CR>
 nmap [t :tprevious<CR>
+
+
+" Custom filetypes
+" ================
+
+augroup vimrc_filetypes
+    au BufNewFile,BufRead *.teccen setfiletype teccen
+augroup END

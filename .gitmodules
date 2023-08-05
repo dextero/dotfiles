@@ -4,3 +4,6 @@
 [submodule ".gdb/gdb-dashboard"]
 	path = .gdb/gdb-dashboard
 	url = https://github.com/cyrus-and/gdb-dashboard
+[submodule ".gdb/GdbAsciiHexPrint"]
+	path = .gdb/GdbAsciiHexPrint
+	url = https://github.com/hq6/GdbAsciiHexPrint

@@ -1,5 +1,21 @@
 [user]
 	email = marcin@mradomski.pl
 	name = Marcin Radomski
+[color]
+	ui = true
+[difftool]
+	prompt = false
+[merge]
+	tool = vimdiff3
+[credential]
+	helper = cache --timeout 60
+[alias]
+	stash-unapply = !git stash show -p | git apply -R
 [rerere]
-	enabled = 1
+    enable = true
+[core]
+	excludesfile = ~/.gitignore
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[init]
+	defaultBranch = master
