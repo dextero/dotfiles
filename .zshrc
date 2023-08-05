@@ -259,11 +259,6 @@ git-extract-changes-to-file() {
         && git commit -am "Extract changes to $* from previous commit"
 }
 
-tts() {
-    local DOMAIN="${DOMAIN:-zygfryd.comp.avsystem.in}"
-    http --verbose get "http://$DOMAIN:8000/play/tts/pl/$(python3 -c 'import urllib; import sys; print(urllib.quote(sys.stdin.read().strip()))' <<<"$*")"
-}
-
 export CMAKE_BULLSHIT=(CMakeCache.txt CMakeFiles CPackConfig.cmake CPackSourceConfig CMakeScripts Testing CTestTestfile.cmake Makefile cmake_install.cmake install_manifest.txt compile_commands.json)
 export SBT_OPTS="-Xmx4G -XX:+UseG1GC -XX:+CMSClassUnloadingEnabled -Xss2M"
 
