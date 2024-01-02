@@ -169,8 +169,6 @@ DEBFULLNAME="Marcin Radomski"
 
 DEFAULT_USER=marcin
 
-# Always use 256-color mode
-export TERM=tmux-256color
 alias tmux="/usr/bin/tmux -2"
 
 # Store core dumps by default
