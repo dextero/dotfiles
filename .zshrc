@@ -1,12 +1,138 @@
+export NPM_PACKAGES="$HOME/.npm-packages"
+export PATH=$HOME/bin/ccache:$PATH
+export PATH=$PATH:$HOME/.bin
+export PATH=$PATH:$HOME/bin
+export PATH=$PATH:$HOME/.local/bin
+export PATH=$PATH:$HOME/arcanist/arcanist/bin
+export PATH=$PATH:$HOME/.gem/ruby/3.0.0/bin:$HOME/.gem/bin
+export PATH=$PATH:$HOME/.cargo/bin
+export PATH=$PATH:$HOME/go/bin
+export PATH=$PATH:$HOME/.npm-packages/bin
+export MANPATH=$MANPATH:$NPM_PACKAGES/share/man
+export NODE_PATH=$NODE_PATH:$NPM_PACKAGES/lib/node_modules
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
 # Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
+export ZSH="$HOME/.oh-my-zsh"
+
+color() {
+  local black=30
+  local red=31
+  local green=32
+  local yellow=33
+  local blue=34
+  local magenta=35
+  local cyan=36
+  local white=37
+
+  local gray=90
+  local ltred=91
+  local ltgreen=92
+  local ltyellow=93
+  local ltblue=94
+  local ltmagenta=95
+  local ltcyan=96
+  local ltwhite=97
+
+  local bg_black=40
+  local bg_red=41
+  local bg_green=42
+  local bg_yellow=43
+  local bg_blue=44
+  local bg_magenta=45
+  local bg_cyan=46
+  local bg_white=47
+
+  local bg_gray=100
+  local bg_ltred=101
+  local bg_ltgreen=102
+  local bg_ltyellow=103
+  local bg_ltblue=104
+  local bg_ltmagenta=105
+  local bg_ltcyan=106
+  local bg_ltwhite=107
+
+  local reset=0
+  local bold=1
+
+  local STYLE=""
+  while [[ "$1" != -- ]]; do
+    if [[ "${(P)1}" ]]; then
+      STYLE+="\x1b[${(P)1}m"
+      shift
+    else
+      break
+    fi
+  done
+
+  echo -n "${STYLE}""$@""\x1b[${reset}m"
+}
+
+verbose() {
+  echo "$(color blue -- Running: "$@")"
+  "$@"
+}
+
+is-installed() {
+  local EXECUTABLE="$1"
+  which "$EXECUTABLE" >/dev/null 2>&1
+}
+
+ensure-installed() {
+  local EXECUTABLE="$1"
+  shift
+  is-installed "$EXECUTABLE" || {
+    verbose "$@"
+  }
+}
+
+confirm() {
+  local QUERY="$1"
+  shift
+
+  echo -n "$(color yellow -- "${QUERY} [Y/n] ")"
+  read PROMPT
+
+  case "${PROMPT}" in
+    ""|y*|Y*)
+      echo "Executing: $@"
+      "$@"
+      ;;
+    *)
+      echo "Skipping: $@"
+      return 1
+      ;;
+  esac
+}
+
+ensure-installed git "sudo apt install -y git"
+
+bootstrap-oh-my-zsh() {
+  verbose git clone https://github.com/ohmyzsh/ohmyzsh.git "$ZSH"
+  [[ -d "$ZSH/themes/bullet-train" ]] || verbose git clone https://github.com/caiogondim/bullet-train.zsh.git "$ZSH/themes/bullet-train"
+  [[ -e "$ZSH/themes/bullet-train.zsh-theme" ]] || verbose ln -s "$ZSH/themes/bullet-train/bullet-train.zsh-theme" "$ZSH/themes/"
+  [[ -d "$ZSH/custom/zsh-async" ]] || verbose git clone https://github.com/mafredri/zsh-async.git "$ZSH/custom/zsh-async"
+}
+
+[[ -d "$ZSH" ]] || confirm "Bootstrap oh-my-zsh?" bootstrap-oh-my-zsh
+
+bootstrap-atuin() {
+    /bin/bash -c "$(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)"
+    sed -i -e '/sync_address/a sync_address = "https://home.mradomski.pl/atuin/"' "$HOME/.config/atuin/config.toml"
+    atuin login -u dex
+}
+
+is-installed atuin || confirm "Bootstrap atuin?" bootstrap-atuin
+eval "$(atuin init zsh)"
+
+ensure-installed br "cargo install broot"
+source /home/dex/.config/broot/launcher/bash/br
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-[[ -d $ZSH/themes/bullet-train ]] || git clone https://github.com/caiogondim/bullet-train.zsh $ZSH/themes/bullet-train
-[[ -e $ZSH/themes/bullet-train.zsh-theme ]] || ln -s $ZSH/themes/bullet-train/bullet-train.zsh-theme $ZSH/themes/
 ZSH_THEME="bullet-train"
 
 BULLETTRAIN_PROMPT_CHAR="$"
@@ -120,30 +246,12 @@ HISTFILESIZE=-1
 # Example format: plugins=(rails git textmate ruby lighthouse)
 plugins=(git zsh-syntax-highlighting)
 
-source $ZSH/oh-my-zsh.sh
+source "$ZSH/oh-my-zsh.sh"
 
 zstyle ':completion:*' use-cache on
 zstyle ':completion:*' cache-path ~/.zsh/cache
 
-source /etc/zsh_command_not_found
-
-export NPM_PACKAGES="$HOME/.npm-packages"
-
-export PATH=$HOME/bin/ccache:$PATH
-export PATH=$PATH:$HOME/.bin
-export PATH=$PATH:$HOME/bin
-export PATH=$PATH:$HOME/.local/bin
-export PATH=$PATH:$HOME/arcanist/arcanist/bin
-export PATH=$PATH:$HOME/.gem/ruby/3.0.0/bin:$HOME/.gem/bin
-export PATH=$PATH:$HOME/.cargo/bin
-export PATH=$PATH:$HOME/go/bin
-export PATH=$PATH:$HOME/.npm-packages/bin
-
-export MANPATH=$MANPATH:$NPM_PACKAGES/share/man
-
-export NODE_PATH=$NODE_PATH:$NPM_PACKAGES/lib/node_modules
-
-# export MANPATH="/usr/local/man:$MANPATH"
+[[ -f "/etc/zsh_command_not_found" ]] && source /etc/zsh_command_not_found
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -169,6 +277,8 @@ DEBFULLNAME="Marcin Radomski"
 
 DEFAULT_USER=marcin
 
+# Always use 256-color mode
+export TERM=tmux-256color
 alias tmux="/usr/bin/tmux -2"
 
 # Store core dumps by default
@@ -182,12 +292,13 @@ alias gsuir="git submodule update --init --recursive"
 gssuir() { git submodule sync; gsuir }
 alias gcamane="git commit --amend -a --no-edit"
 
-# Install FZF if required
-[[ -d ~/.fzf ]] || {
-    git clone https://github.com/junegunn/fzf ~/.fzf
-    ~/.fzf/install
+bootstrap-fzf() {
+    git clone https://github.com/junegunn/fzf.git "$HOME/.fzf"
+    "$HOME/.fzf/install"
 }
-source ~/.fzf.zsh
+# Install FZF if required
+[[ -d "$HOME/.fzf" ]] || confirm "Bootstrap fzf?" bootstrap-fzf
+source "$HOME/.fzf.zsh"
 
 # Force tmux
 [[ -z "$SSH_CONNECTION" && "$SHLVL" == "1" ]] && tmux
@@ -268,8 +379,6 @@ fi
 
 # OPAM configuration
 . /home/dex/.opam/opam-init/init.zsh > /dev/null 2> /dev/null || true
-
-source /home/dex/.config/broot/launcher/bash/br
 
 esp32-enable() {
     . /home/dex/export-esp.sh
