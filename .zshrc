@@ -79,14 +79,6 @@ is-installed() {
   which "$EXECUTABLE" >/dev/null 2>&1
 }
 
-ensure-installed() {
-  local EXECUTABLE="$1"
-  shift
-  is-installed "$EXECUTABLE" || {
-    verbose "$@"
-  }
-}
-
 confirm() {
   local QUERY="$1"
   shift
@@ -106,7 +98,7 @@ confirm() {
   esac
 }
 
-ensure-installed git "sudo apt install -y git"
+is-installed git || sudo apt install -y git
 
 bootstrap-oh-my-zsh() {
   verbose git clone https://github.com/ohmyzsh/ohmyzsh.git "$ZSH"
@@ -126,7 +118,7 @@ bootstrap-atuin() {
 is-installed atuin || confirm "Bootstrap atuin?" bootstrap-atuin
 eval "$(atuin init zsh)"
 
-ensure-installed br "cargo install broot"
+is-installed broot || cargo install broot
 source /home/dex/.config/broot/launcher/bash/br
 
 # Set name of the theme to load.
