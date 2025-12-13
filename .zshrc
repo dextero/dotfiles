@@ -13,6 +13,8 @@ export NODE_PATH=$NODE_PATH:$NPM_PACKAGES/lib/node_modules
 
 # export MANPATH="/usr/local/man:$MANPATH"
 
+# TODO: use regular zsh async prompt
+zstyle ':omz:alpha:lib:git' async-prompt no
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -98,7 +100,10 @@ confirm() {
   esac
 }
 
-is-installed git || sudo apt install -y git
+is-installed git || {
+  is-installed apt && sudo apt install -y git
+  is-installed dnf && sudo dnf install -y git
+}
 
 bootstrap-oh-my-zsh() {
   verbose git clone https://github.com/ohmyzsh/ohmyzsh.git "$ZSH"
@@ -109,17 +114,7 @@ bootstrap-oh-my-zsh() {
 
 [[ -d "$ZSH" ]] || confirm "Bootstrap oh-my-zsh?" bootstrap-oh-my-zsh
 
-bootstrap-atuin() {
-    /bin/bash -c "$(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)"
-    sed -i -e '/sync_address/a sync_address = "https://home.mradomski.pl/atuin/"' "$HOME/.config/atuin/config.toml"
-    atuin login -u dex
-}
-
-is-installed atuin || confirm "Bootstrap atuin?" bootstrap-atuin
-eval "$(atuin init zsh)"
-
 is-installed broot || cargo install broot
-source /home/dex/.config/broot/launcher/bash/br
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -155,18 +150,22 @@ _async_git_prompt_build() {
     prompt_git
 }
 
+async_prompt_reset() {
+  async_start_worker async_git_prompt_worker
+  async_register_callback async_git_prompt_worker _async_git_prompt_ready
+}
+
 async_init
-async_start_worker async_git_prompt_worker
-async_register_callback async_git_prompt_worker _async_git_prompt_ready
+async_prompt_reset
 
 prompt_async_git() {
     if [[ "$BULLETTRAIN_ASYNC_GIT_RESULT_EMPTY" ]]; then
-        return
+        prompt_segment "" "" ""
     elif [[ "$BULLETTRAIN_ASYNC_GIT_RESULT" ]]; then
         prompt_segment $BULLETTRAIN_GIT_BG $BULLETTRAIN_GIT_FG "$BULLETTRAIN_ASYNC_GIT_RESULT"
     else
         prompt_segment $BULLETTRAIN_GIT_BG $BULLETTRAIN_GIT_FG "⏳"
-        async_job async_git_prompt_worker _async_git_prompt_build "$PWD"
+        async_job async_git_prompt_worker _async_git_prompt_build "$PWD" || async_prompt_reset
     fi
 }
 
@@ -249,8 +248,11 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 # export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-   export EDITOR='vim'
+if which nvim >/dev/null 2>/dev/null; then
+  export EDITOR=nvim
+else
+  export EDITOR=vim
+fi
 # else
 #   export EDITOR='mvim'
 # fi
@@ -272,6 +274,10 @@ DEFAULT_USER=marcin
 # Always use 256-color mode
 export TERM=tmux-256color
 alias tmux="/usr/bin/tmux -2"
+[[ -d "$HOME/.tmux/plugins/tpm" ]] || {
+    mkdir -p "$HOME/.tmux/plugins" 
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+}
 
 # Store core dumps by default
 ulimit -c unlimited
@@ -290,7 +296,17 @@ bootstrap-fzf() {
 }
 # Install FZF if required
 [[ -d "$HOME/.fzf" ]] || confirm "Bootstrap fzf?" bootstrap-fzf
-source "$HOME/.fzf.zsh"
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+bootstrap-atuin() {
+    /bin/bash -c "$(curl --proto '=https' --tlsv1.2 -sSf https://setup.atuin.sh)"
+    sed -i -e '/sync_address/a sync_address = "https://home.mradomski.pl/atuin/"' "$HOME/.config/atuin/config.toml"
+    atuin login -u dex
+}
+
+. "$HOME/.atuin/bin/env"
+is-installed atuin || confirm "Bootstrap atuin?" bootstrap-atuin
+eval "$(atuin init zsh)"
 
 # Force tmux
 [[ -z "$SSH_CONNECTION" && "$SHLVL" == "1" ]] && tmux
@@ -374,4 +390,11 @@ fi
 
 esp32-enable() {
     . /home/dex/export-esp.sh
+}
+
+alias vim=nvim
+
+ratagui() {
+  cd ~/tools/smithay/smallvil/
+  RUST_BACKTRACE=1 RUST_LOG=info cargo run -- "$@" 2>/tmp/log
 }

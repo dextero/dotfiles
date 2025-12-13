@@ -11,6 +11,7 @@
 	helper = cache --timeout 60
 [alias]
 	stash-unapply = !git stash show -p | git apply -R
+	reviewers = !/home/dex/projects/git-reviewers/git_reviewers/reviewers.py
 [rerere]
     enable = true
 [core]
